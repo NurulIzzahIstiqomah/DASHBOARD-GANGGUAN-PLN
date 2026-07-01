@@ -1,168 +1,340 @@
-body{
-    background:#0f172a;
-    color:white;
-    font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif;
+/* =========================================
+   DASHBOARD MONITORING GANGGUAN PLN
+========================================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
 }
 
-/* ==========================
+body{
+    background:#F4F7FB;
+    font-family:'Segoe UI',sans-serif;
+    color:#1F2937;
+}
+
+/* =========================================
    HEADER
-========================== */
+========================================= */
 
 .topbar{
-    background:#111827;
-    padding:18px;
-    border-radius:10px;
-    margin-top:15px;
-    box-shadow:0 0 10px rgba(0,0,0,.3);
+    background:#005BAC;
+    color:white;
+    padding:18px 25px;
+    border-radius:14px;
+    box-shadow:0 6px 15px rgba(0,0,0,.10);
 }
 
-/* ==========================
+.topbar h3{
+    margin:0;
+    font-weight:700;
+}
+
+/* =========================================
    CARD KPI
-========================== */
+========================================= */
 
 .card-dashboard{
-    background:#1e293b;
-    border-radius:12px;
-    padding:20px;
-    margin-bottom:15px;
-    transition:.3s;
-    box-shadow:0 5px 12px rgba(0,0,0,.25);
+
+    color:white;
+    border-radius:16px;
+    padding:24px;
+    height:100%;
+    transition:.25s;
+    box-shadow:0 6px 18px rgba(0,0,0,.10);
+
 }
 
 .card-dashboard:hover{
-    transform:translateY(-3px);
+
+    transform:translateY(-5px);
+
 }
 
 .card-dashboard h2{
-    font-size:34px;
-    font-weight:bold;
+
+    font-size:40px;
+    font-weight:700;
+    margin-bottom:8px;
+
 }
 
 .card-dashboard p{
+
     margin:0;
-    color:#cbd5e1;
+    font-size:15px;
+    opacity:.95;
+
 }
 
-.green{
-    background:#16a34a;
+/* WARNA KPI */
+
+.primary{
+
+    background:#2563EB;
+
 }
 
-.orange{
-    background:#f59e0b;
+.success{
+
+    background:#16A34A;
+
 }
 
-.purple{
-    background:#7c3aed;
+.warning{
+
+    background:#F59E0B;
+
 }
 
-/* ==========================
+.danger{
+
+    background:#DC2626;
+
+}
+
+/* =========================================
    PANEL
-========================== */
+========================================= */
 
 .panel{
-    background:#1e293b;
-    border-radius:12px;
-    padding:15px;
-    min-height:650px;
-    box-shadow:0 5px 12px rgba(0,0,0,.25);
+
+    background:white;
+    border-radius:16px;
+    padding:18px;
+    border:1px solid #E5E7EB;
+    box-shadow:0 4px 15px rgba(0,0,0,.05);
+    height:100%;
+
 }
 
-/* ==========================
-   MAP
-========================== */
+.panel h5{
 
-#map{
-    height:650px;
-    border-radius:12px;
-    overflow:hidden;
+    color:#1F2937;
+    font-weight:700;
+    margin-bottom:18px;
+
 }
 
-/* ==========================
+/* =========================================
    FILTER
-========================== */
+========================================= */
 
 .form-select{
-    background:#0f172a;
-    color:white;
-    border:1px solid #334155;
+
+    height:46px;
+    border-radius:10px;
+    border:1px solid #D1D5DB;
+    background:white;
+    color:#1F2937;
+    margin-bottom:12px;
+
 }
 
 .form-select:focus{
-    background:#0f172a;
-    color:white;
+
+    border-color:#005BAC;
+    box-shadow:0 0 0 .18rem rgba(0,91,172,.15);
+
 }
 
-/* ==========================
-   DETAIL PANEL
-========================== */
+.btn-outline-primary{
+
+    border-radius:10px;
+    font-weight:600;
+    height:45px;
+
+}
+
+/* =========================================
+   MAP
+========================================= */
+
+#map{
+
+    width:100%;
+    height:720px;
+    border-radius:16px;
+    border:1px solid #E5E7EB;
+    overflow:hidden;
+    box-shadow:0 4px 15px rgba(0,0,0,.05);
+
+}
+
+/* =========================================
+   DETAIL
+========================================= */
 
 #detail{
-    margin-top:10px;
-    color:#cbd5e1;
+
+    color:#374151;
+
 }
 
 .detail-card{
-    color:white;
+
+    color:#374151;
+
 }
 
 .detail-title{
-    color:#38bdf8;
-    font-size:22px;
-    font-weight:bold;
-    margin-bottom:10px;
+
+    color:#005BAC;
+    font-size:24px;
+    font-weight:700;
+    margin-bottom:12px;
+
 }
 
 .detail-photo{
+
     width:100%;
-    height:180px;
+    height:220px;
     object-fit:cover;
-    border-radius:10px;
-    border:2px solid #334155;
-    margin-bottom:15px;
+    border-radius:12px;
+    cursor:pointer;
+    margin-bottom:18px;
+    transition:.25s;
+    border:1px solid #E5E7EB;
+
+}
+
+.detail-photo:hover{
+
+    transform:scale(1.02);
+
 }
 
 .status{
+
     display:inline-block;
-    padding:6px 14px;
-    border-radius:25px;
+    padding:7px 15px;
+    border-radius:30px;
     color:white;
     font-size:13px;
-    font-weight:bold;
+    font-weight:600;
     margin-bottom:18px;
+
 }
 
 .status.sudah{
-    background:#16a34a;
+
+    background:#16A34A;
+
 }
 
 .status.belum{
-    background:#dc2626;
+
+    background:#DC2626;
+
 }
 
 .detail-item{
-    margin-bottom:14px;
+
+    margin-bottom:16px;
+
 }
 
 .detail-label{
-    color:#60a5fa;
+
+    color:#005BAC;
+    font-weight:700;
     font-size:13px;
-    font-weight:bold;
+    margin-bottom:2px;
+
 }
 
 .detail-value{
-    color:#e2e8f0;
-    font-size:14px;
+
+    color:#374151;
+    font-size:15px;
     line-height:1.5;
+
 }
 
-hr{
-    border:1px solid #334155;
-}
-
-/* ==========================
+/* =========================================
    GAMBAR
-========================== */
+========================================= */
 
 img{
-    border-radius:8px;
+
+    max-width:100%;
+    border-radius:10px;
+
+}
+
+/* =========================================
+   LEAFLET
+========================================= */
+
+.leaflet-container{
+
+    border-radius:16px;
+
+}
+
+.leaflet-popup-content{
+
+    font-size:14px;
+
+}
+
+/* =========================================
+   SCROLLBAR
+========================================= */
+
+::-webkit-scrollbar{
+
+    width:8px;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#BFC7D5;
+    border-radius:20px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#EEF2F7;
+
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media(max-width:992px){
+
+    #map{
+
+        height:500px;
+
+    }
+
+    .card-dashboard h2{
+
+        font-size:30px;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    #map{
+
+        height:420px;
+
+    }
+
+    .detail-photo{
+
+        height:180px;
+
+    }
+
 }
