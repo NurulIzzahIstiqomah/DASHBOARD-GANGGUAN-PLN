@@ -8,30 +8,85 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "&copy; OpenStreetMap"
 }).addTo(map);
 
-const markers = L.markerClusterGroup();
+// ============================
+// Marker Cluster
+// ============================
+
+const markers = L.markerClusterGroup({
+
+    showCoverageOnHover: false,
+
+    zoomToBoundsOnClick: true,
+
+    spiderfyOnMaxZoom: true,
+
+    disableClusteringAtZoom: 18
+
+});
+
+// Tambahkan KE PETA cukup sekali
+map.addLayer(markers);
+
+// ============================
+// Variabel Global
+// ============================
 
 let semuaData = [];
 
+let chartBulanan = null;
+let chartPenyebab = null;
+let chartUP3 = null;
+let chartGI = null;
+
+// ============================
+// Warna Dashboard
+// ============================
+
+const warnaPLN = {
+    biru: "#005BAC",
+    biruMuda: "#4DA3FF",
+    kuning: "#FFC107",
+    hijau: "#28A745",
+    merah: "#DC3545",
+    abu: "#E9ECEF"
+};
+// ============================
+// UPDATE DASHBOARD
+// ============================
+
+function updateDashboard(data){
+
+    tampilKPI(data);
+
+    tampilMarker(data);
+
+    tampilChartBulanan(data);
+
+    tampilChartPenyebab(data);
+
+    tampilChartUP3(data);
+
+    tampilChartGI(data);
+
+    tampilInsight(data);
+}
 
 // ============================
 // Ambil Data JSON
 // ============================
 
 fetch("dashboard_data.json")
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
 
         semuaData = data;
 
         isiFilter(data);
 
-        tampilKPI(data);
-
-        tampilMarker(data);
+        updateDashboard(data);
 
     })
-    .catch(error => console.error(error));
-
+    .catch(err => console.error(err));
 
 // ============================
 // KPI
@@ -49,18 +104,695 @@ function tampilKPI(data){
         item["TINDAK LANJUT"] === "BELUM TINDAK LANJUT"
     ).length;
 
-    const totalENS = data.reduce((total,item)=>{
+    document.getElementById("sudahTL").textContent = sudah;
+    document.getElementById("belumTL").textContent = belum;
+
+    // ============================
+    // Total ENS
+    // ============================
+
+    const totalENS = data.reduce((total, item) => {
 
         return total + Number(item["TOTAL ENS"] || 0);
 
-    },0);
-
-    document.getElementById("sudahTL").textContent = sudah;
-
-    document.getElementById("belumTL").textContent = belum;
+    }, 0);
 
     document.getElementById("totalENS").textContent =
-        totalENS.toLocaleString("id-ID");
+        `${totalENS.toLocaleString("id-ID", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        })} kWh`;
+
+    // ============================
+    // Rata-rata Lama Padam
+    // ============================
+
+    const totalDetik = data.reduce((total, item) => {
+
+        if (!item.LamaPadam) return total;
+
+        const waktu = item.LamaPadam.split(":");
+
+        if (waktu.length !== 3) return total;
+
+        const jam = parseInt(waktu[0]) || 0;
+        const menit = parseInt(waktu[1]) || 0;
+        const detik = parseInt(waktu[2]) || 0;
+
+        return total + (jam * 3600) + (menit * 60) + detik;
+
+    }, 0);
+
+    const rataDetik = data.length > 0 ? totalDetik / data.length : 0;
+
+    const jam = Math.floor(rataDetik / 3600);
+    const menit = Math.floor((rataDetik % 3600) / 60);
+    const detik = Math.floor(rataDetik % 60);
+
+    let teksDurasi = "";
+
+    if (jam > 0) {
+
+        teksDurasi = `${jam} Jam ${menit} Menit`;
+
+    } else if (menit > 0) {
+
+        teksDurasi = `${menit} Menit ${detik} Detik`;
+
+    } else {
+
+        teksDurasi = `${detik} Detik`;
+
+    }
+
+    document.getElementById("rataPadam").textContent = teksDurasi;
+
+}
+
+// ============================
+// CHART BULANAN
+// ============================
+
+function tampilChartBulanan(data){
+
+    const canvas = document.getElementById("chartBulanan");
+
+    if(!canvas) return;
+
+    const jumlah = Array(12).fill(0);
+
+    data.forEach(item=>{
+
+        if(!item.Tanggal) return;
+
+        const tgl = item.Tanggal.split("/");
+
+        if(tgl.length < 2) return;
+
+        const bulan = parseInt(tgl[1]) - 1;
+
+        if(bulan >= 0 && bulan < 12){
+
+            jumlah[bulan]++;
+
+        }
+
+    });
+
+    if(chartBulanan){
+
+        chartBulanan.destroy();
+
+    }
+
+    chartBulanan = new Chart(canvas,{
+
+        type:"bar",
+
+        data:{
+
+            labels:[
+                "Jan","Feb","Mar","Apr","Mei","Jun",
+                "Jul","Agu","Sep","Okt","Nov","Des"
+            ],
+
+            datasets:[{
+
+                data:jumlah,
+
+                backgroundColor:"#005BAC",
+
+                borderRadius:8,
+
+                maxBarThickness:40
+
+            }]
+
+        },
+
+        options:{
+
+            responsive:true,
+
+            maintainAspectRatio:false,
+
+            plugins:{
+
+                legend:{
+                    display:false
+                }
+
+            },
+
+            scales:{
+
+                y:{
+                    beginAtZero:true
+                }
+
+            }
+
+        }
+
+    });
+
+}
+
+// ============================
+// CHART PENYEBAB GANGGUAN
+// ============================
+// ============================
+// KATEGORI PENYEBAB
+// ============================
+
+function kategoriPenyebab(teks){
+
+    teks = (teks || "").toLowerCase();
+
+    if(
+        teks.includes("pohon") ||
+        teks.includes("ranting") ||
+        teks.includes("dahan")
+    ){
+        return "Pohon";
+    }
+
+    if(teks.includes("layang")){
+        return "Layang-layang";
+    }
+
+    if(
+        teks.includes("petir") ||
+        teks.includes("surja")
+    ){
+        return "Petir";
+    }
+
+    if(
+        teks.includes("binatang") ||
+        teks.includes("ular") ||
+        teks.includes("burung") ||
+        teks.includes("monyet")
+    ){
+        return "Binatang";
+    }
+
+    if(
+        teks.includes("trafo") ||
+        teks.includes("transformator")
+    ){
+        return "Trafo";
+    }
+
+    if(
+        teks.includes("konduktor") ||
+        teks.includes("kabel")
+    ){
+        return "Konduktor";
+    }
+
+    if(teks.includes("isolator")){
+        return "Isolator";
+    }
+
+    if(teks.includes("jumper")){
+        return "Jumper";
+    }
+
+    if(teks.includes("arrester")){
+        return "Lightning Arrester";
+    }
+
+    return "Lainnya";
+
+}
+// ============================
+// TOP PENYEBAB GANGGUAN
+// ============================
+
+// ============================
+// TOP PENYEBAB GANGGUAN
+// ============================
+
+function tampilChartPenyebab(data){
+
+    const canvas = document.getElementById("chartPenyebab");
+
+    if(!canvas) return;
+
+    const hasil = {};
+
+    data.forEach(item=>{
+
+        const penyebab = kategoriPenyebab(item["Penyebab Padam"]);
+
+        hasil[penyebab] = (hasil[penyebab] || 0) + 1;
+
+    });
+
+    const urut = Object.entries(hasil)
+        .sort((a,b)=>b[1]-a[1]);
+
+    const labels = urut.map(item=>item[0]);
+    const values = urut.map(item=>item[1]);
+
+    if(chartPenyebab){
+
+        chartPenyebab.destroy();
+
+    }
+
+    chartPenyebab = new Chart(canvas,{
+
+        type:"bar",
+
+        data:{
+
+            labels:labels,
+
+            datasets:[{
+
+                label:"Jumlah Gangguan",
+
+                data:values,
+
+                backgroundColor:[
+                    "#005BAC",
+                    "#0A6FD6",
+                    "#16A34A",
+                    "#F59E0B",
+                    "#DC2626",
+                    "#7C3AED",
+                    "#06B6D4",
+                    "#64748B",
+                    "#94A3B8"
+                ],
+
+                borderRadius:10,
+
+                borderSkipped:false,
+
+                maxBarThickness:28
+
+            }]
+
+        },
+
+        options:{
+
+            indexAxis:"y",
+
+            responsive:true,
+
+            maintainAspectRatio:false,
+
+            animation:{
+                duration:800
+            },
+
+            plugins:{
+
+                legend:{
+                    display:false
+                },
+
+                tooltip:{
+                    displayColors:false
+                }
+
+            },
+
+            scales:{
+
+                x:{
+                    beginAtZero:true,
+                    ticks:{
+                        precision:0
+                    },
+                    grid:{
+                        color:"#E5E7EB"
+                    }
+                },
+
+                y:{
+                    grid:{
+                        display:false
+                    },
+                    ticks:{
+                        font:{
+                            size:13,
+                            weight:"600"
+                        }
+                    }
+                }
+
+            }
+
+        }
+
+    });
+
+}
+
+// ============================
+// TOP 10 UP3
+// ============================
+
+function tampilChartUP3(data){
+
+    const canvas = document.getElementById("chartUP3");
+
+    if(!canvas) return;
+
+    const hasil = {};
+
+    data.forEach(item=>{
+
+        const up3 = item.UP3 || "Tidak Diketahui";
+
+        hasil[up3] = (hasil[up3] || 0) + 1;
+
+    });
+
+    const urut = Object.entries(hasil)
+        .sort((a,b)=>b[1]-a[1])
+        .slice(0,10);
+
+    const labels = urut.map(item=>item[0]);
+
+    const values = urut.map(item=>item[1]);
+
+    if(chartUP3){
+
+        chartUP3.destroy();
+
+    }
+
+    chartUP3 = new Chart(canvas,{
+
+        type:"bar",
+
+        data:{
+
+            labels:labels,
+
+            datasets:[{
+
+                label:"Jumlah Gangguan",
+
+                data:values,
+
+                backgroundColor:"#005BAC",
+
+                hoverBackgroundColor:"#0A6FD6",
+
+                borderRadius:10,
+
+                borderSkipped:false,
+
+                maxBarThickness:28
+
+            }]
+
+        },
+
+        options:{
+
+            indexAxis:"y",
+
+            responsive:true,
+
+            maintainAspectRatio:false,
+
+            animation:{
+                duration:700
+            },
+
+            plugins:{
+
+                legend:{
+                    display:false
+                },
+
+                tooltip:{
+                    displayColors:false
+                }
+
+            },
+
+            scales:{
+
+                x:{
+                    beginAtZero:true,
+
+                    ticks:{
+                        precision:0
+                    },
+
+                    grid:{
+                        color:"#E5E7EB"
+                    }
+
+                },
+
+                y:{
+
+                    grid:{
+                        display:false
+                    },
+
+                    ticks:{
+
+                        font:{
+                            size:13,
+                            weight:"600"
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    });
+
+}
+
+// ============================
+// TOP 10 GARDU INDUK
+// ============================
+
+function tampilChartGI(data){
+
+    const canvas = document.getElementById("chartGI");
+
+    if(!canvas) return;
+
+    const hasil = {};
+
+    data.forEach(item=>{
+
+        const gi = item["Gardu Induk"] || "Tidak Diketahui";
+
+        hasil[gi] = (hasil[gi] || 0) + 1;
+
+    });
+
+    const urut = Object.entries(hasil)
+        .sort((a,b)=>b[1]-a[1])
+        .slice(0,10);
+
+    const labels = urut.map(item=>item[0]);
+
+    const values = urut.map(item=>item[1]);
+
+    if(chartGI){
+
+        chartGI.destroy();
+
+    }
+
+    chartGI = new Chart(canvas,{
+
+        type:"bar",
+
+        data:{
+
+            labels:labels,
+
+            datasets:[{
+
+                label:"Jumlah Gangguan",
+
+                data:values,
+
+                backgroundColor:"#16A34A",
+
+                hoverBackgroundColor:"#22C55E",
+
+                borderRadius:10,
+
+                borderSkipped:false,
+
+                maxBarThickness:28
+
+            }]
+
+        },
+
+        options:{
+
+            indexAxis:"y",
+
+            responsive:true,
+
+            maintainAspectRatio:false,
+
+            animation:{
+                duration:700
+            },
+
+            plugins:{
+
+                legend:{
+                    display:false
+                },
+
+                tooltip:{
+                    displayColors:false
+                }
+
+            },
+
+            scales:{
+
+                x:{
+                    beginAtZero:true,
+
+                    ticks:{
+                        precision:0
+                    },
+
+                    grid:{
+                        color:"#E5E7EB"
+                    }
+
+                },
+
+                y:{
+
+                    grid:{
+                        display:false
+                    },
+
+                    ticks:{
+
+                        font:{
+                            size:13,
+                            weight:"600"
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    });
+
+}
+
+// ============================
+// QUICK INSIGHT
+// ============================
+
+function tampilInsight(data){
+
+    const total = data.length;
+
+    if(total === 0){
+
+        document.getElementById("insightText").innerHTML =
+        "Tidak ada data yang sesuai dengan filter yang dipilih.";
+
+        return;
+
+    }
+
+    // ==========================
+    // UP3 Terbanyak
+    // ==========================
+
+    const up3 = {};
+
+    data.forEach(item=>{
+
+        const nama = item.UP3 || "-";
+
+        up3[nama] = (up3[nama] || 0) + 1;
+
+    });
+
+    const topUP3 = Object.entries(up3)
+        .sort((a,b)=>b[1]-a[1])[0];
+
+    // ==========================
+    // GI Terbanyak
+    // ==========================
+
+    const gi = {};
+
+    data.forEach(item=>{
+
+        const nama = item["Gardu Induk"] || "-";
+
+        gi[nama] = (gi[nama] || 0) + 1;
+
+    });
+
+    const topGI = Object.entries(gi)
+        .sort((a,b)=>b[1]-a[1])[0];
+
+    // ==========================
+    // Penyebab Dominan
+    // ==========================
+
+    const penyebab = {};
+
+    data.forEach(item=>{
+
+        const nama = kategoriPenyebab(item["Penyebab Padam"]);
+
+        penyebab[nama] = (penyebab[nama] || 0) + 1;
+
+    });
+
+    const topPenyebab = Object.entries(penyebab)
+        .sort((a,b)=>b[1]-a[1])[0];
+
+    // ==========================
+    // Belum Tindak Lanjut
+    // ==========================
+
+    const belum = data.filter(item=>
+
+        item["TINDAK LANJUT"] === "BELUM TINDAK LANJUT"
+
+    ).length;
+
+    const persen = ((belum/total)*100).toFixed(1);
+
+    // ==========================
+    // Insight
+    // ==========================
+
+    document.getElementById("insightText").innerHTML =
+
+    `Berdasarkan filter yang dipilih, terdapat <b>${total.toLocaleString("id-ID")}</b> gangguan pada jaringan distribusi. Gangguan paling banyak terjadi di <b>${topUP3[0]}</b> sebanyak <b>${topUP3[1]}</b> kejadian, sedangkan Gardu Induk dengan jumlah gangguan tertinggi adalah <b>${topGI[0]}</b> sebanyak <b>${topGI[1]}</b> kejadian. Penyebab gangguan yang paling dominan adalah <b>${topPenyebab[0]}</b> dengan <b>${topPenyebab[1]}</b> kejadian. Dari seluruh gangguan tersebut, terdapat <b>${belum}</b> gangguan (<b>${persen}%</b>) yang masih berstatus <b>Belum Tindak Lanjut</b> sehingga perlu menjadi prioritas penanganan.`;
 
 }
 
@@ -72,26 +804,144 @@ function isiFilter(data){
 
     const filterUP3 = document.getElementById("filterUP3");
     const filterULP = document.getElementById("filterULP");
-    const filterStatus = document.getElementById("filterStatus");
+    const filterGI = document.getElementById("filterGI");
+    const filterTL = document.getElementById("filterTL");
 
-    const daftarUP3 = [...new Set(data.map(item => item.UP3).filter(Boolean))].sort();
-    const daftarULP = [...new Set(data.map(item => item.ULP).filter(Boolean))].sort();
-    const daftarStatus = [...new Set(data.map(item => item["TINDAK LANJUT"]).filter(Boolean))].sort();
+    filterUP3.innerHTML = '<option value="">Semua UP3</option>';
+    filterULP.innerHTML = '<option value="">Semua ULP</option>';
+    filterGI.innerHTML = '<option value="">Semua Gardu Induk</option>';
+    filterTL.innerHTML = '<option value="">Semua Tindak Lanjut</option>';
 
-    daftarUP3.forEach(item => {
-        filterUP3.innerHTML += `<option value="${item}">${item}</option>`;
+    // =====================
+    // UP3
+    // =====================
+
+    [...new Set(data.map(item=>item.UP3).filter(Boolean))]
+    .sort()
+    .forEach(item=>{
+
+        filterUP3.innerHTML +=
+        `<option value="${item}">${item}</option>`;
+
     });
 
-    daftarULP.forEach(item => {
-        filterULP.innerHTML += `<option value="${item}">${item}</option>`;
+    // =====================
+    // ULP
+    // =====================
+
+    [...new Set(data.map(item=>item.ULP).filter(Boolean))]
+    .sort()
+    .forEach(item=>{
+
+        filterULP.innerHTML +=
+        `<option value="${item}">${item}</option>`;
+
     });
 
-    daftarStatus.forEach(item => {
-        filterStatus.innerHTML += `<option value="${item}">${item}</option>`;
+    // =====================
+    // GI
+    // =====================
+
+    [...new Set(data.map(item=>item["Gardu Induk"]).filter(Boolean))]
+    .sort()
+    .forEach(item=>{
+
+        filterGI.innerHTML +=
+        `<option value="${item}">${item}</option>`;
+
+    });
+
+    // =====================
+    // Tindak Lanjut
+    // =====================
+
+    [...new Set(data.map(item=>item["TINDAK LANJUT"]).filter(Boolean))]
+    .sort()
+    .forEach(item=>{
+
+        filterTL.innerHTML +=
+        `<option value="${item}">${item}</option>`;
+
     });
 
 }
 
+// ============================
+// FILTER ULP BERDASARKAN UP3
+// ============================
+
+function isiFilterULP(){
+
+    const up3 =
+    document.getElementById("filterUP3").value;
+
+    const filterULP =
+    document.getElementById("filterULP");
+
+    filterULP.innerHTML =
+    '<option value="">Semua ULP</option>';
+
+    const dataFilter = semuaData.filter(item=>{
+
+        return up3==="" || item.UP3===up3;
+
+    });
+
+    const daftarULP =
+    [...new Set(
+
+        dataFilter
+        .map(item=>item.ULP)
+        .filter(Boolean)
+
+    )].sort();
+
+    daftarULP.forEach(ulp=>{
+
+        filterULP.innerHTML +=
+
+        `<option value="${ulp}">${ulp}</option>`;
+
+    });
+
+}
+
+function isiFilterGI(){
+
+    const up3 = document.getElementById("filterUP3").value;
+    const ulp = document.getElementById("filterULP").value;
+
+    const filterGI = document.getElementById("filterGI");
+
+    filterGI.innerHTML =
+    '<option value="">Semua Gardu Induk</option>';
+
+    let data = semuaData;
+
+    if(up3 !== ""){
+
+        data = data.filter(item => item.UP3 === up3);
+
+    }
+
+    if(ulp !== ""){
+
+        data = data.filter(item => item.ULP === ulp);
+
+    }
+
+    const daftarGI = [...new Set(
+        data.map(item => item["Gardu Induk"]).filter(Boolean)
+    )].sort();
+
+    daftarGI.forEach(gi=>{
+
+        filterGI.innerHTML +=
+        `<option value="${gi}">${gi}</option>`;
+
+    });
+
+}
 
 // ============================
 // Marker
@@ -99,17 +949,14 @@ function isiFilter(data){
 
 function tampilMarker(data){
 
-    // Hapus marker lama
     markers.clearLayers();
 
     data.forEach(item => {
 
-        // Ambil koordinat
         const lat = parseFloat(item.Latitude);
         const lng = parseFloat(item.Longitude);
 
-        // Lewati jika koordinat kosong / bukan angka / di luar wilayah S2JB
-        if (
+        if(
             isNaN(lat) || isNaN(lng) ||
             lat < -6 || lat > -1 ||
             lng < 102 || lng > 106
@@ -117,24 +964,34 @@ function tampilMarker(data){
             return;
         }
 
-        // Buat marker
         const marker = L.marker([lat, lng]);
 
-        // Klik marker
-        marker.on("click", () => {
+        marker.bindTooltip(
+            `<b>${item.Penyulang}</b><br>${item.UP3} - ${item.ULP}`,
+            {
+                direction:"top",
+                offset:[0,-15]
+            }
+        );
+
+        marker.on("click",function(){
+
+            // zoom sedikit lebih dekat
+            map.flyTo([lat,lng],15,{
+                animate:true,
+                duration:0.6
+            });
 
             const statusClass =
                 item["TINDAK LANJUT"] === "SUDAH TINDAK LANJUT"
                 ? "sudah"
                 : "belum";
 
-            document.getElementById("detail").innerHTML = `
+            document.getElementById("detail").innerHTML=`
 
                 <div class="detail-card">
 
-                    <div class="detail-title">
-                        ${item.Penyulang}
-                    </div>
+                    <div class="detail-title">${item.Penyulang}</div>
 
                     <div class="status ${statusClass}">
                         ${item["TINDAK LANJUT"]}
@@ -144,7 +1001,6 @@ function tampilMarker(data){
                         class="detail-photo"
                         src="${item.FOTO1}"
                         onclick="lihatFoto('${item.FOTO1}')"
-                        style="cursor:pointer"
                         onerror="this.style.display='none'">
 
                     <div class="detail-item">
@@ -174,79 +1030,80 @@ function tampilMarker(data){
 
                     <div class="detail-item">
                         <div class="detail-label">⚠ Penyebab</div>
-                        <div class="detail-value">
-                            ${item["Penyebab Padam"] || "-"}
-                        </div>
+                        <div class="detail-value">${item["Penyebab Padam"] || "-"}</div>
                     </div>
 
                     <div class="detail-item">
                         <div class="detail-label">📝 Justifikasi</div>
-                        <div class="detail-value">
-                            ${item["JUSTIFIKASI TEMUAN GANGGUAN MELALUI APPSHEET"] || "-"}
-                        </div>
+                        <div class="detail-value">${item["JUSTIFIKASI TEMUAN GANGGUAN MELALUI APPSHEET"] || "-"}</div>
                     </div>
 
                 </div>
 
             `;
 
-            // Zoom ke lokasi
-            map.flyTo([lat, lng], 13);
-
         });
 
-        // Tambahkan marker ke cluster
         markers.addLayer(marker);
 
     });
 
-    // Tambahkan cluster ke peta
-    map.addLayer(markers);
-
 }
 
-document.getElementById("filterUP3")
-.addEventListener("change", filterData);
+document.getElementById("filterUP3").addEventListener("change", () => {
 
-document.getElementById("filterULP")
-.addEventListener("change", filterData);
+    isiFilterULP();
+    isiFilterGI();
+    filterData();
 
-document.getElementById("filterStatus")
-.addEventListener("change", filterData);
+});
+
+document.getElementById("filterULP").addEventListener("change", () => {
+
+    isiFilterGI();
+    filterData();
+
+});
+
+document.getElementById("filterGI").addEventListener("change", filterData);
+
+document.getElementById("filterTL").addEventListener("change", filterData);
+
 
 function filterData(){
 
     const up3 = document.getElementById("filterUP3").value;
     const ulp = document.getElementById("filterULP").value;
-    const status = document.getElementById("filterStatus").value;
+    const gi = document.getElementById("filterGI").value;
+    const tl = document.getElementById("filterTL").value;
 
-    const hasil = semuaData.filter(item=>{
+    const hasil = semuaData.filter(item => {
 
         return (
 
-            (up3==="" || item.UP3===up3)
+            (up3 === "" || item.UP3 === up3) &&
 
-            &&
+            (ulp === "" || item.ULP === ulp) &&
 
-            (ulp==="" || item.ULP===ulp)
+            (gi === "" || item["Gardu Induk"] === gi) &&
 
-            &&
-
-            (status==="" || item["TINDAK LANJUT"]===status)
+            (tl === "" || item["TINDAK LANJUT"] === tl)
 
         );
 
     });
 
-    tampilKPI(hasil);
-
-    tampilMarker(hasil);
+    updateDashboard(hasil);
 
 }
 
-function lihatFoto(url){
+// ============================
+// Lihat Foto
+// ============================
 
-    document.getElementById("fotoBesar").src = url;
+function lihatFoto(src){
+
+    document.getElementById("fotoBesar").src = src;
 
     const modal = new bootstrap.Modal(
         document.getElementById("fotoModal")

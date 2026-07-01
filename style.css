@@ -1,6 +1,8 @@
-/* =========================================
-   DASHBOARD MONITORING GANGGUAN PLN
-========================================= */
+/* ===========================================
+        GOOGLE FONT
+=========================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 *{
     margin:0;
@@ -9,224 +11,440 @@
 }
 
 body{
+
     background:#F4F7FB;
-    font-family:'Segoe UI',sans-serif;
+
+    font-family:'Poppins',sans-serif;
+
     color:#1F2937;
+
 }
 
-/* =========================================
-   HEADER
-========================================= */
+.container-fluid{
 
-.topbar{
-    background:#005BAC;
+    max-width:1900px;
+
+}
+
+/* ===========================================
+                HEADER
+=========================================== */
+
+.dashboard-header{
+
+    background:linear-gradient(90deg,#005BAC,#0A6FD6);
+
+    border-radius:18px;
+
+    padding:25px 35px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.12);
+
+}
+
+.header-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:22px;
+
+}
+
+.logo-pln{
+
+    width:80px;
+
+}
+
+.header-title h2{
+
     color:white;
-    padding:18px 25px;
-    border-radius:14px;
-    box-shadow:0 6px 15px rgba(0,0,0,.10);
-}
 
-.topbar h3{
-    margin:0;
+    font-size:32px;
+
     font-weight:700;
-}
 
-/* =========================================
-   CARD KPI
-========================================= */
-
-.card-dashboard{
-
-    color:white;
-    border-radius:16px;
-    padding:24px;
-    height:100%;
-    transition:.25s;
-    box-shadow:0 6px 18px rgba(0,0,0,.10);
+    margin-bottom:4px;
 
 }
 
-.card-dashboard:hover{
+.header-title p{
 
-    transform:translateY(-5px);
-
-}
-
-.card-dashboard h2{
-
-    font-size:40px;
-    font-weight:700;
-    margin-bottom:8px;
-
-}
-
-.card-dashboard p{
+    color:#D9ECFF;
 
     margin:0;
+
     font-size:15px;
-    opacity:.95;
 
 }
 
-/* WARNA KPI */
+.header-right{
 
-.primary{
+    display:flex;
+
+    gap:18px;
+
+    align-items:center;
+
+}
+
+.header-box{
+
+    background:rgba(255,255,255,.12);
+
+    backdrop-filter:blur(10px);
+
+    border-radius:12px;
+
+    padding:12px 18px;
+
+    color:white;
+
+    display:flex;
+
+    gap:12px;
+
+    align-items:center;
+
+}
+
+.header-box i{
+
+    font-size:28px;
+
+}
+
+.header-box small{
+
+    display:block;
+
+    color:#DDEEFF;
+
+}
+
+.header-box strong{
+
+    font-size:18px;
+
+}
+
+/* ===========================================
+                KPI
+=========================================== */
+
+.kpi-card{
+
+    background:white;
+
+    border-radius:18px;
+
+    padding:22px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+    transition:.25s;
+
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
+
+    height:100%;
+
+}
+
+.kpi-card:hover{
+
+    transform:translateY(-6px);
+
+}
+
+.kpi-icon{
+
+    width:65px;
+
+    height:65px;
+
+    border-radius:18px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:30px;
+
+    color:white;
+
+}
+
+.kpi-content span{
+
+    font-size:14px;
+
+    color:#64748B;
+
+}
+
+.kpi-content h2{
+
+    font-size:34px;
+
+    font-weight:700;
+
+    margin:4px 0;
+
+}
+
+.kpi-content small{
+
+    color:#94A3B8;
+
+}
+
+.kpi-blue .kpi-icon{
 
     background:#2563EB;
 
 }
 
-.success{
+.kpi-green .kpi-icon{
 
     background:#16A34A;
 
 }
 
-.warning{
+.kpi-orange .kpi-icon{
 
     background:#F59E0B;
 
 }
 
-.danger{
+.kpi-purple .kpi-icon{
+
+    background:#7C3AED;
+
+}
+
+.kpi-red .kpi-icon{
 
     background:#DC2626;
 
 }
 
-/* =========================================
-   PANEL
-========================================= */
+/* ===========================================
+                PANEL
+=========================================== */
 
 .panel{
 
     background:white;
-    border-radius:16px;
-    padding:18px;
+
+    border-radius:18px;
+
+    padding:22px;
+
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
+
     border:1px solid #E5E7EB;
-    box-shadow:0 4px 15px rgba(0,0,0,.05);
+
     height:100%;
 
 }
 
-.panel h5{
+.panel-title{
 
-    color:#1F2937;
-    font-weight:700;
-    margin-bottom:18px;
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    font-size:18px;
+
+    font-weight:600;
+
+    color:#0F172A;
 
 }
 
-/* =========================================
-   FILTER
-========================================= */
+.panel-title i{
+
+    color:#005BAC;
+
+    font-size:20px;
+
+}
+
+.panel hr{
+
+    margin:18px 0;
+
+    border-color:#E5E7EB;
+
+}
+
+/* ===========================================
+                FILTER
+=========================================== */
+
+.filter-label{
+
+    font-size:13px;
+
+    font-weight:600;
+
+    color:#475569;
+
+    margin-bottom:8px;
+
+    display:block;
+
+}
 
 .form-select{
 
-    height:46px;
-    border-radius:10px;
-    border:1px solid #D1D5DB;
-    background:white;
-    color:#1F2937;
-    margin-bottom:12px;
+    height:48px;
+
+    border-radius:12px;
+
+    border:1px solid #CBD5E1;
+
+    font-size:14px;
+
+    transition:.2s;
+
+}
+
+.form-select:hover{
+
+    border-color:#005BAC;
 
 }
 
 .form-select:focus{
 
     border-color:#005BAC;
-    box-shadow:0 0 0 .18rem rgba(0,91,172,.15);
+
+    box-shadow:0 0 0 .2rem rgba(0,91,172,.15);
 
 }
 
-.btn-outline-primary{
+#resetFilter{
 
-    border-radius:10px;
+    height:48px;
+
+    border-radius:12px;
+
+    background:#005BAC;
+
+    border:none;
+
     font-weight:600;
-    height:45px;
 
 }
 
-/* =========================================
-   MAP
-========================================= */
+#resetFilter:hover{
+
+    background:#00478A;
+
+}
+
+/* ===========================================
+                MAP
+=========================================== */
 
 #map{
 
     width:100%;
-    height:720px;
+
+    height:700px;
+
     border-radius:16px;
-    border:1px solid #E5E7EB;
+
     overflow:hidden;
-    box-shadow:0 4px 15px rgba(0,0,0,.05);
 
 }
 
-/* =========================================
-   DETAIL
-========================================= */
+.leaflet-container{
+
+    border-radius:16px;
+
+}
+
+/* ===========================================
+            DETAIL GANGGUAN
+=========================================== */
 
 #detail{
 
-    color:#374151;
+    min-height:700px;
 
 }
 
-.detail-card{
+.empty-detail{
 
-    color:#374151;
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    text-align:center;
+
+    height:620px;
+
+    color:#94A3B8;
+
+}
+
+.empty-detail i{
+
+    font-size:70px;
+
+    color:#CBD5E1;
+
+    margin-bottom:20px;
 
 }
 
 .detail-title{
 
-    color:#005BAC;
     font-size:24px;
+
     font-weight:700;
-    margin-bottom:12px;
+
+    color:#0F172A;
+
+    margin-bottom:15px;
 
 }
 
 .detail-photo{
 
     width:100%;
+
     height:220px;
+
     object-fit:cover;
-    border-radius:12px;
+
+    border-radius:14px;
+
+    margin-bottom:18px;
+
     cursor:pointer;
-    margin-bottom:18px;
-    transition:.25s;
-    border:1px solid #E5E7EB;
-
-}
-
-.detail-photo:hover{
-
-    transform:scale(1.02);
-
-}
-
-.status{
-
-    display:inline-block;
-    padding:7px 15px;
-    border-radius:30px;
-    color:white;
-    font-size:13px;
-    font-weight:600;
-    margin-bottom:18px;
-
-}
-
-.status.sudah{
-
-    background:#16A34A;
-
-}
-
-.status.belum{
-
-    background:#DC2626;
 
 }
 
@@ -238,18 +456,231 @@ body{
 
 .detail-label{
 
-    color:#005BAC;
-    font-weight:700;
-    font-size:13px;
-    margin-bottom:2px;
+    font-size:12px;
+
+    color:#64748B;
+
+    font-weight:600;
+
+    margin-bottom:3px;
 
 }
 
 .detail-value{
 
-    color:#374151;
     font-size:15px;
-    line-height:1.5;
+
+    color:#1E293B;
+
+}
+
+.status{
+
+    display:inline-block;
+
+    padding:7px 18px;
+
+    border-radius:30px;
+
+    font-size:12px;
+
+    font-weight:700;
+
+    margin-bottom:18px;
+
+}
+
+.status.sudah{
+
+    background:#DCFCE7;
+
+    color:#15803D;
+
+}
+
+.status.belum{
+
+    background:#FEE2E2;
+
+    color:#DC2626;
+
+}
+
+/* ===========================================
+                CHART
+=========================================== */
+
+canvas{
+
+    width:100% !important;
+
+    max-height:350px;
+
+}
+
+.chart-container{
+
+    position:relative;
+
+    width:100%;
+
+    height:350px;
+
+}
+
+.chart-title{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    margin-bottom:15px;
+
+}
+
+/* ===========================================
+            INSIGHT
+=========================================== */
+
+.insight-box{
+
+    background:linear-gradient(135deg,#005BAC,#0A6FD6);
+
+    color:white;
+
+    border-radius:18px;
+
+    padding:25px;
+
+    box-shadow:0 8px 20px rgba(0,91,172,.18);
+
+}
+
+.insight-title{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    font-size:20px;
+
+    font-weight:700;
+
+    margin-bottom:15px;
+
+}
+
+.insight-title i{
+
+    font-size:26px;
+
+}
+
+#insightText{
+
+    font-size:15px;
+
+    line-height:1.8;
+
+    margin:0;
+
+}
+
+/* ===========================================
+                TABLE
+=========================================== */
+
+.table{
+
+    margin-bottom:0;
+
+}
+
+.table thead{
+
+    background:#005BAC;
+
+    color:white;
+
+}
+
+.table thead th{
+
+    border:none;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    white-space:nowrap;
+
+}
+
+.table tbody td{
+
+    vertical-align:middle;
+
+    font-size:14px;
+
+}
+
+.table-hover tbody tr:hover{
+
+    background:#F1F5F9;
+
+}
+
+.table-responsive{
+
+    border-radius:12px;
+
+}
+
+/* ===========================================
+                BUTTON
+=========================================== */
+
+.btn{
+
+    border-radius:12px;
+
+    font-weight:600;
+
+    transition:.25s;
+
+}
+
+.btn-warning{
+
+    background:#FFC107;
+
+    border:none;
+
+    color:#1F2937;
+
+}
+
+.btn-warning:hover{
+
+    background:#FFB300;
+
+}
+
+.btn-primary{
+
+    background:#005BAC;
+
+    border:none;
+
+}
+
+.btn-primary:hover{
+
+    background:#004A8C;
 
 }
 
@@ -280,44 +711,59 @@ img{
 
 }
 
-/* =========================================
-   SCROLLBAR
-========================================= */
+/* ===========================================
+            SCROLLBAR
+=========================================== */
 
 ::-webkit-scrollbar{
 
-    width:8px;
-
-}
-
-::-webkit-scrollbar-thumb{
-
-    background:#BFC7D5;
-    border-radius:20px;
+    width:10px;
 
 }
 
 ::-webkit-scrollbar-track{
 
-    background:#EEF2F7;
+    background:#E5E7EB;
 
 }
 
-/* =========================================
-   RESPONSIVE
-========================================= */
+::-webkit-scrollbar-thumb{
 
-@media(max-width:992px){
+    background:#005BAC;
 
-    #map{
+    border-radius:30px;
 
-        height:500px;
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#004A8C;
+
+}
+
+/* ===========================================
+            RESPONSIVE
+=========================================== */
+
+@media(max-width:1200px){
+
+    .dashboard-header{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:20px;
 
     }
 
-    .card-dashboard h2{
+    .header-right{
 
-        font-size:30px;
+        width:100%;
+
+        justify-content:space-between;
+
+        flex-wrap:wrap;
 
     }
 
@@ -325,16 +771,86 @@ img{
 
 @media(max-width:768px){
 
+    .logo-pln{
+
+        width:60px;
+
+    }
+
+    .header-title h2{
+
+        font-size:22px;
+
+    }
+
+    .kpi-card{
+
+        padding:18px;
+
+    }
+
     #map{
 
-        height:420px;
+        height:500px;
 
     }
 
-    .detail-photo{
+    #detail{
 
-        height:180px;
+        min-height:auto;
 
     }
 
+}
+
+/* ===========================================
+            ANIMATION
+=========================================== */
+
+.panel{
+
+    transition:.3s;
+
+}
+
+.panel:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:0 15px 30px rgba(0,0,0,.12);
+
+}
+
+.kpi-card{
+
+    transition:.3s;
+
+}
+
+.kpi-card:hover{
+
+    transform:translateY(-6px);
+
+}
+
+.dashboard-header{
+
+    transition:.3s;
+
+}
+
+.dashboard-header:hover{
+
+    box-shadow:0 18px 35px rgba(0,91,172,.25);
+
+}
+
+.logo-pln{
+    width:70px;
+    height:auto;
+}
+
+#insightText b{
+    color:#FFC107;
+    font-weight:700;
 }

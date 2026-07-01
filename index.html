@@ -45,7 +45,9 @@
             <div class="modal-header">
 
                 <h5 class="modal-title text-white">
+
                     Foto Gangguan
+
                 </h5>
 
                 <button
@@ -61,7 +63,7 @@
                 <img
                     id="fotoBesar"
                     src=""
-                    style="width:100%;max-height:80vh;object-fit:contain;">
+                    style="width:100%;max-height:85vh;object-fit:contain;">
 
             </div>
 
@@ -72,79 +74,142 @@
 </div>
 
 <!-- ===========================
-     DASHBOARD
+     CONTAINER
 ============================ -->
 
-<div class="container-fluid py-3">
+<div class="container-fluid p-4">
 
-    <!-- HEADER -->
+<!-- ======================================================
+                        HEADER
+======================================================= -->
 
-    <div class="row mb-3">
+<div class="container-fluid px-4 pt-4">
 
-        <div class="col-12">
+    <div class="dashboard-header">
 
-            <div class="topbar">
+        <!-- Logo + Judul -->
 
-                <h3 class="mb-0">
+        <div class="header-left">
 
-                    ⚡ Dashboard Monitoring Gangguan PLN
+            <img
+                src="assets/logo-pln.png"
+                alt="Logo PLN"
+                class="logo-pln">
 
-                </h3>
+            <div class="header-title">
+
+                <h2>
+
+                    Dashboard Monitoring Gangguan Distribusi PLN
+
+                </h2>
+
+                <p>
+
+                    UID S2JB • Sumatera Bagian Selatan
+
+                </p>
 
             </div>
 
         </div>
 
+        <!-- Informasi -->
+
+        <div class="header-right">
+
+            <div class="header-box">
+
+                <i class="bi bi-calendar3"></i>
+
+                <div>
+
+                    <small>Last Update</small>
+
+                    <strong id="lastUpdate">
+
+                        -
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+            <div class="header-box">
+
+                <i class="bi bi-database-fill"></i>
+
+                <div>
+
+                    <small>Total Data</small>
+
+                    <strong id="jumlahData">
+
+                        0
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+            <div class="header-box">
+
+                <i class="bi bi-geo-alt-fill"></i>
+
+                <div>
+
+                    <small>Wilayah</small>
+
+                    <strong>
+
+                        UID S2JB
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+            <button
+                class="btn btn-warning px-4">
+
+                <i class="bi bi-download"></i>
+
+                Export
+
+            </button>
+
+        </div>
+
     </div>
 
+<!-- ======================================================
+                        KPI
+======================================================= -->
 
-    <!-- KPI -->
+<div class="row g-4 mt-2 mb-4">
 
-    <div class="row g-3 mb-3">
+    <!-- Total Gangguan -->
 
-        <div class="col-lg-3 col-md-6">
+    <div class="col-xl col-lg-6 col-md-6">
 
-            <div class="card-dashboard primary">
+        <div class="kpi-card kpi-blue">
+
+            <div class="kpi-icon">
+
+                <i class="bi bi-lightning-charge-fill"></i>
+
+            </div>
+
+            <div class="kpi-content">
+
+                <span>Total Gangguan</span>
 
                 <h2 id="totalGangguan">0</h2>
 
-                <p>Total Gangguan</p>
-
-            </div>
-
-        </div>
-
-        <div class="col-lg-3 col-md-6">
-
-            <div class="card-dashboard success">
-
-                <h2 id="sudahTL">0</h2>
-
-                <p>Sudah Tindak Lanjut</p>
-
-            </div>
-
-        </div>
-
-        <div class="col-lg-3 col-md-6">
-
-            <div class="card-dashboard danger">
-
-                <h2 id="belumTL">0</h2>
-
-                <p>Belum Tindak Lanjut</p>
-
-            </div>
-
-        </div>
-
-        <div class="col-lg-3 col-md-6">
-
-            <div class="card-dashboard warning">
-
-                <h2 id="totalENS">0</h2>
-
-                <p>Total ENS (kWh)</p>
+                <small>Jumlah gangguan tercatat</small>
 
             </div>
 
@@ -152,106 +217,273 @@
 
     </div>
 
+    <!-- Sudah Tindak Lanjut -->
 
-    <!-- ISI DASHBOARD -->
+    <div class="col-xl col-lg-6 col-md-6">
 
-    <div class="row g-3">
+        <div class="kpi-card kpi-green">
 
-        <!-- FILTER -->
+            <div class="kpi-icon">
 
-        <div class="col-lg-2">
+                <i class="bi bi-check-circle-fill"></i>
 
-            <div class="panel">
+            </div>
 
-                <h5 class="mb-3">
+            <div class="kpi-content">
 
-                    <i class="bi bi-funnel-fill"></i>
+                <span>Sudah Tindak Lanjut</span>
 
-                    Filter Data
+                <h2 id="sudahTL">0</h2>
 
-                </h5>
-
-                <select id="filterUP3" class="form-select mb-2">
-
-                    <option value="">Semua UP3</option>
-
-                </select>
-
-                <select id="filterULP" class="form-select mb-2">
-
-                    <option value="">Semua ULP</option>
-
-                </select>
-
-                <select id="filterGI" class="form-select mb-2">
-
-                    <option value="">Semua Gardu Induk</option>
-
-                </select>
-
-                <select id="filterStatus" class="form-select mb-2">
-
-                    <option value="">Semua Status Gangguan</option>
-
-                </select>
-
-                <select id="filterTL" class="form-select mb-3">
-
-                    <option value="">Semua Tindak Lanjut</option>
-
-                </select>
-
-                <button
-                    id="resetFilter"
-                    class="btn btn-outline-primary w-100">
-
-                    <i class="bi bi-arrow-clockwise"></i>
-
-                    Reset Filter
-
-                </button>
+                <small>Status selesai</small>
 
             </div>
 
         </div>
 
+    </div>
 
-        <!-- PETA -->
+    <!-- Belum Tindak Lanjut -->
 
-        <div class="col-lg-7">
+    <div class="col-xl col-lg-6 col-md-6">
+
+        <div class="kpi-card kpi-orange">
+
+            <div class="kpi-icon">
+
+                <i class="bi bi-exclamation-circle-fill"></i>
+
+            </div>
+
+            <div class="kpi-content">
+
+                <span>Belum Tindak Lanjut</span>
+
+                <h2 id="belumTL">0</h2>
+
+                <small>Perlu penanganan</small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ENS -->
+
+    <div class="col-xl col-lg-6 col-md-6">
+
+        <div class="kpi-card kpi-purple">
+
+            <div class="kpi-icon">
+
+                <i class="bi bi-battery-charging"></i>
+
+            </div>
+
+            <div class="kpi-content">
+
+                <span>Total ENS</span>
+
+                <h2 id="totalENS">0</h2>
+
+                <small>Energi Tidak Tersalurkan</small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Gardu Induk -->
+
+    <div class="col-xl col-lg-6 col-md-6">
+
+        <div class="kpi-card kpi-red">
+
+            <div class="kpi-icon">
+
+                <i class="bi bi-building-fill"></i>
+
+            </div>
+
+            <div class="kpi-content">
+
+                <span>Rata-rata Lama Padam</span>
+                <h2 id="rataPadam">0 Jam</h2>
+                <small>Durasi rata-rata per gangguan</small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ======================================================
+                    MAIN DASHBOARD
+======================================================= -->
+
+<div class="row g-4">
+
+    <!-- ================= FILTER ================= -->
+
+    <div class="col-xl-2">
+
+        <div class="panel">
+
+            <div class="panel-title">
+
+                <i class="bi bi-funnel-fill"></i>
+
+                <span>Filter Data</span>
+
+            </div>
+
+            <hr>
+
+            <label class="filter-label">
+
+                UP3
+
+            </label>
+
+            <select
+                id="filterUP3"
+                class="form-select mb-3">
+
+                <option value="">
+                    Semua UP3
+                </option>
+
+            </select>
+
+            <label class="filter-label">
+
+                ULP
+
+            </label>
+
+            <select
+                id="filterULP"
+                class="form-select mb-3">
+
+                <option value="">
+                    Semua ULP
+                </option>
+
+            </select>
+
+            <label class="filter-label">
+
+                Gardu Induk
+
+            </label>
+
+            <select
+                id="filterGI"
+                class="form-select mb-3">
+
+                <option value="">
+                    Semua Gardu Induk
+                </option>
+
+            </select>
+
+            <label class="filter-label">
+
+                Tindak Lanjut
+
+            </label>
+
+            <select
+                id="filterTL"
+                class="form-select mb-4">
+
+                <option value="">
+                    Semua Status
+                </option>
+
+            </select>
+
+            <button
+                id="resetFilter"
+                class="btn btn-primary w-100">
+
+                <i class="bi bi-arrow-repeat"></i>
+
+                Reset Filter
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- ================= MAP ================= -->
+
+    <div class="col-xl-7">
+
+        <div class="panel">
+
+            <div class="panel-title">
+
+                <i class="bi bi-map-fill"></i>
+
+                <span>
+
+                    Peta Sebaran Gangguan
+
+                </span>
+
+            </div>
+
+            <hr>
 
             <div id="map"></div>
 
         </div>
 
+    </div>
 
-        <!-- DETAIL -->
+    <!-- ================= DETAIL ================= -->
 
-        <div class="col-lg-3">
+    <div class="col-xl-3">
 
-            <div class="panel">
+        <div class="panel">
 
-                <h5 class="mb-3">
+            <div class="panel-title">
 
-                    <i class="bi bi-info-circle-fill"></i>
+                <i class="bi bi-info-circle-fill"></i>
+
+                <span>
 
                     Detail Gangguan
 
-                </h5>
+                </span>
 
-                <div id="detail">
+            </div>
 
-                    <div class="text-center mt-5">
+            <hr>
 
-                        <i class="bi bi-geo-alt-fill fs-1 text-secondary"></i>
+            <div id="detail">
 
-                        <p class="mt-3">
+                <div class="empty-detail">
 
-                            Klik marker pada peta untuk melihat detail gangguan.
+                    <i class="bi bi-geo-alt-fill"></i>
 
-                        </p>
+                    <h5>
 
-                    </div>
+                        Belum Ada Data Dipilih
+
+                    </h5>
+
+                    <p>
+
+                        Klik salah satu marker pada peta untuk menampilkan informasi gangguan.
+
+                    </p>
 
                 </div>
 
@@ -263,22 +495,260 @@
 
 </div>
 
+<!-- ======================================================
+                    ANALISIS DASHBOARD
+======================================================= -->
+
+<div class="row g-4 mt-1">
+
+    <!-- Grafik Gangguan Bulanan -->
+
+    <div class="col-lg-6">
+
+        <div class="panel">
+
+            <div class="panel-title">
+
+                <i class="bi bi-bar-chart-line-fill"></i>
+
+                <span>
+
+                    Grafik Gangguan Bulanan
+
+                </span>
+
+            </div>
+
+            <hr>
+
+            <canvas id="chartBulanan"></canvas>
+
+        </div>
+
+    </div>
+
+    <!-- Grafik Penyebab -->
+
+    <div class="col-lg-6">
+
+        <div class="panel">
+
+            <div class="panel-title">
+
+                <i class="bi bi-pie-chart-fill"></i>
+
+                <span>
+
+                    Distribusi Penyebab Gangguan
+
+                </span>
+
+            </div>
+
+            <hr>
+
+            <canvas id="chartPenyebab"></canvas>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ======================================================
+                    TOP ANALISIS
+======================================================= -->
+
+<div class="row g-4 mt-1">
+
+<!-- Top UP3 -->
+
+<div class="col-lg-6">
+
+    <div class="panel">
+
+        <div class="panel-title">
+
+            <i class="bi bi-buildings-fill"></i>
+
+            <span>Top 10 UP3 Gangguan</span>
+
+        </div>
+
+        <hr>
+
+        <div class="chart-container">
+
+            <canvas id="chartUP3"></canvas>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Top Gardu Induk -->
+
+<div class="col-lg-6">
+
+    <div class="panel">
+
+        <div class="panel-title">
+
+            <i class="bi bi-lightning-charge-fill"></i>
+
+            <span>Top 10 Gardu Induk</span>
+
+        </div>
+
+        <hr>
+
+        <div class="chart-container">
+
+            <canvas id="chartGI"></canvas>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ======================================================
+                    INSIGHT
+======================================================= -->
+
+<div class="row mt-4">
+
+    <div class="col-12">
+
+        <div class="insight-box">
+
+            <div class="insight-title">
+
+                <i class="bi bi-lightbulb-fill"></i>
+
+                Insight Dashboard
+
+            </div>
+
+            <p id="insightText">
+
+                Belum ada insight yang ditampilkan.
+
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ======================================================
+                    TABEL
+======================================================= -->
+
+<div class="row mt-4">
+
+    <div class="col-12">
+
+        <div class="panel">
+
+            <div class="panel-title">
+
+                <i class="bi bi-table"></i>
+
+                <span>
+
+                    Data Gangguan
+
+                </span>
+
+            </div>
+
+            <hr>
+
+            <div class="table-responsive">
+
+                <table
+                    class="table table-hover align-middle"
+                    id="tabelGangguan">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>No</th>
+
+                            <th>Tanggal</th>
+
+                            <th>Penyulang</th>
+
+                            <th>UP3</th>
+
+                            <th>ULP</th>
+
+                            <th>Gardu Induk</th>
+
+                            <th>Status</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 <!-- Bootstrap -->
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- Leaflet -->
-
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <!-- Marker Cluster -->
-
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
-<!-- Javascript -->
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+<!-- Javascript -->
 <script src="script.js"></script>
+
+<div class="row mt-4">
+
+    <div class="col-12">
+
+        <div class="insight-box">
+
+            <div class="insight-title">
+
+                <i class="bi bi-lightbulb-fill"></i>
+
+                <span>Quick Insight</span>
+
+            </div>
+
+            <p id="insightText">
+
+                Memuat insight...
+
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
 
 </body>
 
