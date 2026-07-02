@@ -4,6 +4,23 @@
 
 const map = L.map("map").setView([-3.2, 104.7], 7);
 
+const posisiAwal = [-3.5, 104.7];
+const zoomAwal = 7;
+
+const iconNormal = L.icon({
+    iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+    iconSize: [25,41],
+    iconAnchor: [12,41]
+});
+
+const iconAktif = L.icon({
+    iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+    iconSize: [35,57],
+    iconAnchor: [17,57]
+});
+
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "&copy; OpenStreetMap"
 }).addTo(map);
@@ -33,6 +50,7 @@ map.addLayer(markers);
 
 let semuaData = [];
 let semuaMarker = [];
+let markerAktif = null;
 
 let chartBulanan = null;
 let chartPenyebab = null;
@@ -84,8 +102,6 @@ fetch("dashboard_data.json")
     .then(data => {
 
         semuaData = data;
-
-        buatSemuaMarker();
 
         isiFilter(data);
 
@@ -176,14 +192,16 @@ function tampilKPI(data){
 }
 
 // ============================
-// CHART BULANAN
+// CHART GANGGUAN BULANAN
 // ============================
+
 function tampilChartBulanan(data){
 
     const canvas = document.getElementById("chartBulanan");
 
     if(!canvas) return;
 
+    // Hitung jumlah gangguan tiap bulan
     const jumlah = Array(12).fill(0);
 
     data.forEach(item => {
@@ -192,46 +210,74 @@ function tampilChartBulanan(data){
 
         const tgl = item.Tanggal.split("/");
 
-        if(tgl.length < 2) return;
+        // Pastikan format tanggal benar (MM/DD/YYYY)
+        if(tgl.length !== 3) return;
 
-        const bulan = parseInt(tgl[1]) - 1;
+        const bulan = Number(tgl[0]);
 
-        if(bulan >= 0 && bulan < 12){
+        if(bulan >= 1 && bulan <= 12){
 
-            jumlah[bulan]++;
+            jumlah[bulan - 1]++;
 
         }
 
     });
 
-    const labels = [
+    // Nama bulan
+    const namaBulan = [
         "Jan","Feb","Mar","Apr","Mei","Jun",
         "Jul","Agu","Sep","Okt","Nov","Des"
     ];
 
-    // Jika chart sudah ada, cukup update datanya
+    // Cari bulan terakhir yang memiliki data
+    let bulanTerakhir = -1;
+
+    for(let i = 11; i >= 0; i--){
+
+        if(jumlah[i] > 0){
+
+            bulanTerakhir = i;
+            break;
+
+        }
+
+    }
+
+    // Kalau tidak ada data
+    if(bulanTerakhir === -1){
+
+        bulanTerakhir = 0;
+
+    }
+
+    const labels = namaBulan.slice(0, bulanTerakhir + 1);
+    const values = jumlah.slice(0, bulanTerakhir + 1);
+
+    // Update chart jika sudah ada
     if(chartBulanan){
 
         chartBulanan.data.labels = labels;
-        chartBulanan.data.datasets[0].data = jumlah;
+        chartBulanan.data.datasets[0].data = values;
         chartBulanan.update();
 
         return;
 
     }
 
-    // Jika belum ada, buat chart sekali saja
+    // Buat chart pertama kali
     chartBulanan = new Chart(canvas,{
 
         type:"bar",
 
         data:{
 
-            labels:labels,
+            labels: labels,
 
             datasets:[{
 
-                data:jumlah,
+                label:"Jumlah Gangguan",
+
+                data: values,
 
                 backgroundColor:"#005BAC",
 
@@ -260,7 +306,13 @@ function tampilChartBulanan(data){
             scales:{
 
                 y:{
-                    beginAtZero:true
+
+                    beginAtZero:true,
+
+                    ticks:{
+                        precision:0
+                    }
+
                 }
 
             }
@@ -274,23 +326,42 @@ function tampilChartBulanan(data){
 // ============================
 // CHART PENYEBAB GANGGUAN
 // ============================
+function kategoriPenyebab(item){
 
-function kategoriPenyebab(teks){
+    const penyebab = (item["Penyebab Padam"] || "").toLowerCase();
+    const justifikasi = (item["JUSTIFIKASI TEMUAN GANGGUAN MELALUI APPSHEET"] || "").toLowerCase();
 
-    teks = (teks || "").toLowerCase();
+    const teks = penyebab + " " + justifikasi;
 
-    if(
-        teks.includes("pohon") ||
-        teks.includes("ranting") ||
-        teks.includes("dahan")
-    ){
-        return "Pohon";
-    }
-
+    // Layang-layang
     if(teks.includes("layang")){
         return "Layang-layang";
     }
 
+    // Pohon / Vegetasi
+    if(
+        teks.includes("pohon") ||
+        teks.includes("ranting") ||
+        teks.includes("dahan") ||
+        teks.includes("bambu") ||
+        teks.includes("vegetasi")
+    ){
+        return "Pohon";
+    }
+
+    // Binatang
+    if(
+        teks.includes("tupai") ||
+        teks.includes("ular") ||
+        teks.includes("burung") ||
+        teks.includes("monyet") ||
+        teks.includes("hewan") ||
+        teks.includes("binatang")
+    ){
+        return "Binatang";
+    }
+
+    // Petir
     if(
         teks.includes("petir") ||
         teks.includes("surja")
@@ -298,22 +369,35 @@ function kategoriPenyebab(teks){
         return "Petir";
     }
 
+    // FCO
     if(
-        teks.includes("binatang") ||
-        teks.includes("ular") ||
-        teks.includes("burung") ||
-        teks.includes("monyet")
+        teks.includes("fco")
     ){
-        return "Binatang";
+        return "FCO";
     }
 
+    // Jumper
     if(
-        teks.includes("trafo") ||
-        teks.includes("transformator")
+        teks.includes("jumper")
     ){
-        return "Trafo";
+        return "Jumper";
     }
 
+    // Isolator
+    if(
+        teks.includes("isolator")
+    ){
+        return "Isolator";
+    }
+
+    // Lightning Arrester
+    if(
+        teks.includes("arrester")
+    ){
+        return "Lightning Arrester";
+    }
+
+    // Konduktor
     if(
         teks.includes("konduktor") ||
         teks.includes("kabel")
@@ -321,16 +405,37 @@ function kategoriPenyebab(teks){
         return "Konduktor";
     }
 
-    if(teks.includes("isolator")){
-        return "Isolator";
+    // Trafo
+    if(
+        teks.includes("trafo") ||
+        teks.includes("transformator")
+    ){
+        return "Trafo";
     }
 
-    if(teks.includes("jumper")){
-        return "Jumper";
+    // Cuaca
+    if(
+        teks.includes("cuaca") ||
+        teks.includes("badai") ||
+        teks.includes("angin")
+    ){
+        return "Cuaca";
     }
 
-    if(teks.includes("arrester")){
-        return "Lightning Arrester";
+    // Belum diketahui
+    if(
+        teks.includes("belum diketahui") ||
+        teks.includes("tidak diketahui") ||
+        teks.includes("belum ditemukan")
+    ){
+        return "Belum Diketahui";
+    }
+
+    // Sedang ditelusuri
+    if(
+        teks.includes("sedang ditelusuri")
+    ){
+        return "Sedang Ditelusuri";
     }
 
     return "Lainnya";
@@ -350,7 +455,7 @@ function tampilChartPenyebab(data){
 
     data.forEach(item=>{
 
-        const penyebab = kategoriPenyebab(item["Penyebab Padam"]);
+        const penyebab = kategoriPenyebab(item);
 
         hasil[penyebab] = (hasil[penyebab] || 0) + 1;
 
@@ -704,11 +809,15 @@ function tampilChartGI(data){
 
 function tampilInsight(data){
 
+    const insight = document.getElementById("insightText");
+
+    if(!insight) return;
+
     const total = data.length;
 
     if(total === 0){
 
-        document.getElementById("insightText").innerHTML =
+        insight.innerHTML =
         "Tidak ada data yang sesuai dengan filter yang dipilih.";
 
         return;
@@ -721,16 +830,15 @@ function tampilInsight(data){
 
     const up3 = {};
 
-    data.forEach(item=>{
+    data.forEach(item => {
 
         const nama = item.UP3 || "-";
-
         up3[nama] = (up3[nama] || 0) + 1;
 
     });
 
     const topUP3 = Object.entries(up3)
-        .sort((a,b)=>b[1]-a[1])[0];
+        .sort((a,b) => b[1]-a[1])[0];
 
     // ==========================
     // GI Terbanyak
@@ -738,10 +846,9 @@ function tampilInsight(data){
 
     const gi = {};
 
-    data.forEach(item=>{
+    data.forEach(item => {
 
         const nama = item["Gardu Induk"] || "-";
-
         gi[nama] = (gi[nama] || 0) + 1;
 
     });
@@ -755,9 +862,9 @@ function tampilInsight(data){
 
     const penyebab = {};
 
-    data.forEach(item=>{
+    data.forEach(item => {
 
-        const nama = kategoriPenyebab(item["Penyebab Padam"]);
+        const nama = kategoriPenyebab(item);
 
         penyebab[nama] = (penyebab[nama] || 0) + 1;
 
@@ -770,21 +877,40 @@ function tampilInsight(data){
     // Belum Tindak Lanjut
     // ==========================
 
-    const belum = data.filter(item=>
+    const belum = data.filter(item =>
 
         item["TINDAK LANJUT"] === "BELUM TINDAK LANJUT"
 
     ).length;
 
-    const persen = ((belum/total)*100).toFixed(1);
+    const persen = ((belum / total) * 100).toFixed(1);
 
     // ==========================
-    // Insight
+    // Tampilkan Insight
     // ==========================
 
-    document.getElementById("insightText").innerHTML =
+    insight.innerHTML = `
+        Berdasarkan filter yang dipilih, terdapat
+        <strong>${total.toLocaleString("id-ID")}</strong> gangguan pada jaringan distribusi.
+        Gangguan paling banyak terjadi di
+        <strong>${topUP3[0]}</strong> sebanyak
+        <strong>${topUP3[1]}</strong> kejadian.
 
-    `Berdasarkan filter yang dipilih, terdapat <b>${total.toLocaleString("id-ID")}</b> gangguan pada jaringan distribusi. Gangguan paling banyak terjadi di <b>${topUP3[0]}</b> sebanyak <b>${topUP3[1]}</b> kejadian, sedangkan Gardu Induk dengan jumlah gangguan tertinggi adalah <b>${topGI[0]}</b> sebanyak <b>${topGI[1]}</b> kejadian. Penyebab gangguan yang paling dominan adalah <b>${topPenyebab[0]}</b> dengan <b>${topPenyebab[1]}</b> kejadian. Dari seluruh gangguan tersebut, terdapat <b>${belum}</b> gangguan (<b>${persen}%</b>) yang masih berstatus <b>Belum Tindak Lanjut</b> sehingga perlu menjadi prioritas penanganan.`;
+        Gardu Induk dengan jumlah gangguan tertinggi adalah
+        <strong>${topGI[0]}</strong> sebanyak
+        <strong>${topGI[1]}</strong> kejadian.
+
+        Penyebab gangguan yang paling dominan adalah
+        <strong>${topPenyebab[0]}</strong> dengan
+        <strong>${topPenyebab[1]}</strong> kejadian.
+
+        Dari seluruh gangguan tersebut terdapat
+        <strong>${belum}</strong> gangguan
+        (<strong>${persen}%</strong>)
+        yang masih berstatus
+        <strong>Belum Tindak Lanjut</strong>
+        sehingga perlu menjadi prioritas penanganan.
+    `;
 
 }
 
@@ -868,41 +994,16 @@ function tampilTabel(data){
 
 }
 
-function buatSemuaMarker(){
+function koordinatValid(lat, lng){
 
-    semuaMarker = [];
-
-    semuaData.forEach(item => {
-
-        const lat = parseFloat(item.Latitude);
-        const lng = parseFloat(item.Longitude);
-
-        if(
-            isNaN(lat) ||
-            isNaN(lng) ||
-            lat < -6 || lat > -1 ||
-            lng < 102 || lng > 106
-        ){
-            return;
-        }
-
-        const marker = L.marker([lat,lng]);
-
-        marker.data = item;
-
-        marker.bindTooltip(
-            `<b>${item.Penyulang}</b><br>${item.UP3} - ${item.ULP}`
-        );
-
-        marker.on("click", function(){
-
-            tampilDetail(marker.data);
-
-        });
-
-        semuaMarker.push(marker);
-
-    });
+    return (
+        !isNaN(lat) &&
+        !isNaN(lng) &&
+        lat >= -6 &&
+        lat <= 1 &&
+        lng >= 100 &&
+        lng <= 107
+    );
 
 }
 
@@ -1056,10 +1157,11 @@ function isiFilterGI(){
 // ============================
 // Marker
 // ============================
-
 function tampilMarker(data){
 
     markers.clearLayers();
+
+    markerAktif = null;
 
     data.forEach(item => {
 
@@ -1074,32 +1176,44 @@ function tampilMarker(data){
             return;
         }
 
-        const marker = L.marker([lat, lng]);
+        const marker = L.marker([lat, lng], {
+            icon: iconNormal
+        });
 
         marker.bindTooltip(
             `<b>${item.Penyulang}</b><br>${item.UP3} - ${item.ULP}`,
             {
-                direction:"top",
-                offset:[0,-15]
+                direction: "top",
+                offset: [0, -15]
             }
         );
 
-        marker.on("click",function(){
+        marker.on("click", function(){
 
-            // zoom sedikit lebih dekat
-            if (map.getZoom() < 15) {
-            map.flyTo([lat, lng], 15, {
-            animate: true,
-            duration: 0.6
-        });
-    }
+            // Kembalikan marker sebelumnya
+            if(markerAktif){
+
+                markerAktif.setIcon(iconNormal);
+
+            }
+
+            // Marker aktif menjadi merah
+            marker.setIcon(iconAktif);
+
+            markerAktif = marker;
+
+            // Zoom
+            map.flyTo([lat, lng], Math.max(map.getZoom(), 15), {
+                animate: true,
+                duration: 0.6
+            });
 
             const statusClass =
                 item["TINDAK LANJUT"] === "SUDAH TINDAK LANJUT"
                 ? "sudah"
                 : "belum";
 
-            document.getElementById("detail").innerHTML=`
+            document.getElementById("detail").innerHTML = `
 
                 <div class="detail-card">
 
@@ -1162,26 +1276,9 @@ function tampilMarker(data){
 
 }
 
-document.getElementById("filterUP3").addEventListener("change", () => {
-
-    isiFilterULP();
-    isiFilterGI();
-    filterData();
-
-});
-
-document.getElementById("filterULP").addEventListener("change", () => {
-
-    isiFilterGI();
-    filterData();
-
-});
-
-document.getElementById("filterGI").addEventListener("change", filterData);
-
-document.getElementById("filterTL").addEventListener("change", filterData);
-
-
+// ============================
+// FILTER DATA
+// ============================ 
 function filterData(){
 
     const up3 = document.getElementById("filterUP3").value;
@@ -1207,6 +1304,84 @@ function filterData(){
 
     updateDashboard(hasil);
 
+    zoomKeFilter(hasil);
+}
+
+// ============================
+// Zoom ke area yang sesuai filter 
+// ============================
+function zoomKeFilter(data){
+
+    if(data.length === 0) return;
+
+    const up3 = document.getElementById("filterUP3").value;
+    const ulp = document.getElementById("filterULP").value;
+    const gi  = document.getElementById("filterGI").value;
+
+    const group = [];
+
+    data.forEach(item => {
+
+        const lat = parseFloat(item.Latitude);
+        const lng = parseFloat(item.Longitude);
+
+        if(
+            !isNaN(lat) &&
+            !isNaN(lng) &&
+            lat >= -6 &&
+            lat <= 1 &&
+            lng >= 100 &&
+            lng <= 107
+        ){
+            group.push(L.latLng(lat, lng));
+        }
+
+    });
+
+    if(group.length === 0) return;
+
+    // Kalau hanya satu marker
+    if(group.length === 1){
+
+        map.flyTo(group[0], 17, {
+            animate: true,
+            duration: 0.8
+        });
+
+        return;
+
+    }
+
+    let maxZoom = zoomAwal;
+
+    if(up3 !== ""){
+
+        maxZoom = 10;
+
+    }
+
+    if(ulp !== ""){
+
+        maxZoom = 12;
+
+    }
+
+    if(gi !== ""){
+
+        maxZoom = 15;
+
+    }
+
+    map.fitBounds(L.latLngBounds(group),{
+
+        padding:[60,60],
+
+        maxZoom:maxZoom,
+
+        animate:true
+
+    });
+
 }
 
 // ============================
@@ -1224,6 +1399,37 @@ function lihatFoto(src){
     modal.show();
 
 }
+
+// ============================
+// EVENT FILTER
+// ============================
+
+document.getElementById("filterUP3").addEventListener("change", () => {
+
+    isiFilterULP();
+    isiFilterGI();
+    filterData();
+
+});
+
+document.getElementById("filterULP").addEventListener("change", () => {
+
+    isiFilterGI();
+    filterData();
+
+});
+
+document.getElementById("filterGI").addEventListener("change", () => {
+
+    filterData();
+
+});
+
+document.getElementById("filterTL").addEventListener("change", () => {
+
+    filterData();
+
+});
 
 // ============================
 // RESET FILTER
@@ -1251,5 +1457,11 @@ document.getElementById("resetFilter").addEventListener("click", function(){
 
     // Tampilkan seluruh dashboard
     updateDashboard(semuaData);
+
+    // Kembalikan peta ke posisi awal
+    map.flyTo(posisiAwal, zoomAwal, {
+        animate: true,
+        duration: 1
+    });
 
 });

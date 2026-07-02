@@ -859,3 +859,21 @@ img{
     position: relative;
     z-index: 9999;
 }
+
+/* Marker aktif */
+
+.marker-active{
+
+    transform: scale(1.35);
+
+    transform-origin: bottom center;
+
+    transition: .25s;
+
+    filter:
+        drop-shadow(0 0 10px rgba(0,91,172,.8))
+        drop-shadow(0 0 20px rgba(0,91,172,.5));
+
+    z-index: 1000 !important;
+
+}
