@@ -32,11 +32,13 @@ map.addLayer(markers);
 // ============================
 
 let semuaData = [];
+let semuaMarker = [];
 
 let chartBulanan = null;
 let chartPenyebab = null;
 let chartUP3 = null;
 let chartGI = null;
+let tabelGangguan = null;
 
 // ============================
 // Warna Dashboard
@@ -69,6 +71,8 @@ function updateDashboard(data){
     tampilChartGI(data);
 
     tampilInsight(data);
+
+    tampilTabel(data);
 }
 
 // ============================
@@ -80,6 +84,8 @@ fetch("dashboard_data.json")
     .then(data => {
 
         semuaData = data;
+
+        buatSemuaMarker();
 
         isiFilter(data);
 
@@ -172,7 +178,6 @@ function tampilKPI(data){
 // ============================
 // CHART BULANAN
 // ============================
-
 function tampilChartBulanan(data){
 
     const canvas = document.getElementById("chartBulanan");
@@ -181,7 +186,7 @@ function tampilChartBulanan(data){
 
     const jumlah = Array(12).fill(0);
 
-    data.forEach(item=>{
+    data.forEach(item => {
 
         if(!item.Tanggal) return;
 
@@ -199,22 +204,30 @@ function tampilChartBulanan(data){
 
     });
 
+    const labels = [
+        "Jan","Feb","Mar","Apr","Mei","Jun",
+        "Jul","Agu","Sep","Okt","Nov","Des"
+    ];
+
+    // Jika chart sudah ada, cukup update datanya
     if(chartBulanan){
 
-        chartBulanan.destroy();
+        chartBulanan.data.labels = labels;
+        chartBulanan.data.datasets[0].data = jumlah;
+        chartBulanan.update();
+
+        return;
 
     }
 
+    // Jika belum ada, buat chart sekali saja
     chartBulanan = new Chart(canvas,{
 
         type:"bar",
 
         data:{
 
-            labels:[
-                "Jan","Feb","Mar","Apr","Mei","Jun",
-                "Jul","Agu","Sep","Okt","Nov","Des"
-            ],
+            labels:labels,
 
             datasets:[{
 
@@ -260,9 +273,6 @@ function tampilChartBulanan(data){
 
 // ============================
 // CHART PENYEBAB GANGGUAN
-// ============================
-// ============================
-// KATEGORI PENYEBAB
 // ============================
 
 function kategoriPenyebab(teks){
@@ -326,14 +336,10 @@ function kategoriPenyebab(teks){
     return "Lainnya";
 
 }
-// ============================
-// TOP PENYEBAB GANGGUAN
-// ============================
 
 // ============================
 // TOP PENYEBAB GANGGUAN
 // ============================
-
 function tampilChartPenyebab(data){
 
     const canvas = document.getElementById("chartPenyebab");
@@ -356,12 +362,19 @@ function tampilChartPenyebab(data){
     const labels = urut.map(item=>item[0]);
     const values = urut.map(item=>item[1]);
 
+    // Kalau chart sudah ada cukup update
     if(chartPenyebab){
 
-        chartPenyebab.destroy();
+        chartPenyebab.data.labels = labels;
+        chartPenyebab.data.datasets[0].data = values;
+
+        chartPenyebab.update();
+
+        return;
 
     }
 
+    // Kalau belum ada baru buat
     chartPenyebab = new Chart(canvas,{
 
         type:"bar",
@@ -385,14 +398,13 @@ function tampilChartPenyebab(data){
                     "#7C3AED",
                     "#06B6D4",
                     "#64748B",
-                    "#94A3B8"
+                    "#EC4899",
+                    "#14B8A6"
                 ],
 
-                borderRadius:10,
+                borderRadius:8,
 
-                borderSkipped:false,
-
-                maxBarThickness:28
+                maxBarThickness:35
 
             }]
 
@@ -400,50 +412,22 @@ function tampilChartPenyebab(data){
 
         options:{
 
-            indexAxis:"y",
-
             responsive:true,
 
             maintainAspectRatio:false,
-
-            animation:{
-                duration:800
-            },
 
             plugins:{
 
                 legend:{
                     display:false
-                },
-
-                tooltip:{
-                    displayColors:false
                 }
 
             },
 
             scales:{
 
-                x:{
-                    beginAtZero:true,
-                    ticks:{
-                        precision:0
-                    },
-                    grid:{
-                        color:"#E5E7EB"
-                    }
-                },
-
                 y:{
-                    grid:{
-                        display:false
-                    },
-                    ticks:{
-                        font:{
-                            size:13,
-                            weight:"600"
-                        }
-                    }
+                    beginAtZero:true
                 }
 
             }
@@ -482,11 +466,15 @@ function tampilChartUP3(data){
 
     const values = urut.map(item=>item[1]);
 
-    if(chartUP3){
+   if(chartUP3){
 
-        chartUP3.destroy();
+    chartUP3.data.labels = labels;
+    chartUP3.data.datasets[0].data = values;
+    chartUP3.update();
 
-    }
+    return;
+
+}
 
     chartUP3 = new Chart(canvas,{
 
@@ -610,7 +598,11 @@ function tampilChartGI(data){
 
     if(chartGI){
 
-        chartGI.destroy();
+    chartGI.data.labels = labels;
+    chartGI.data.datasets[0].data = values;
+    chartGI.update();
+
+    return;
 
     }
 
@@ -797,6 +789,124 @@ function tampilInsight(data){
 }
 
 // ============================
+// TABEL DATA GANGGUAN
+// ============================
+function tampilTabel(data){
+
+    // Pertama kali buat DataTable
+    if(!tabelGangguan){
+
+        tabelGangguan = $("#tabelGangguan").DataTable({
+
+            pageLength:10,
+
+            lengthMenu:[10,25,50,100],
+
+            responsive:true,
+
+            destroy:false,
+
+            order:[],
+
+            autoWidth:false,
+
+            language:{
+
+                search:"🔍 Cari :",
+
+                lengthMenu:"Tampilkan _MENU_ data",
+
+                info:"Menampilkan _START_ - _END_ dari _TOTAL_ data",
+
+                zeroRecords:"Data tidak ditemukan",
+
+                paginate:{
+                    previous:"←",
+                    next:"→"
+                }
+
+            }
+
+        });
+
+    }
+
+    // Kosongkan isi tabel
+    tabelGangguan.clear();
+
+    // Tambahkan data baru
+    data.forEach((item,index)=>{
+
+        const badge =
+            item["TINDAK LANJUT"]==="SUDAH TINDAK LANJUT"
+
+            ? `<span class="badge bg-success">Sudah</span>`
+
+            : `<span class="badge bg-warning text-dark">Belum</span>`;
+
+        tabelGangguan.row.add([
+
+            index+1,
+
+            item.Tanggal || "-",
+
+            item.Penyulang || "-",
+
+            item.UP3 || "-",
+
+            item.ULP || "-",
+
+            item["Gardu Induk"] || "-",
+
+            badge
+
+        ]);
+
+    });
+
+    tabelGangguan.draw(false);
+
+}
+
+function buatSemuaMarker(){
+
+    semuaMarker = [];
+
+    semuaData.forEach(item => {
+
+        const lat = parseFloat(item.Latitude);
+        const lng = parseFloat(item.Longitude);
+
+        if(
+            isNaN(lat) ||
+            isNaN(lng) ||
+            lat < -6 || lat > -1 ||
+            lng < 102 || lng > 106
+        ){
+            return;
+        }
+
+        const marker = L.marker([lat,lng]);
+
+        marker.data = item;
+
+        marker.bindTooltip(
+            `<b>${item.Penyulang}</b><br>${item.UP3} - ${item.ULP}`
+        );
+
+        marker.on("click", function(){
+
+            tampilDetail(marker.data);
+
+        });
+
+        semuaMarker.push(marker);
+
+    });
+
+}
+
+// ============================
 // ISI FILTER
 // ============================
 
@@ -977,10 +1087,12 @@ function tampilMarker(data){
         marker.on("click",function(){
 
             // zoom sedikit lebih dekat
-            map.flyTo([lat,lng],15,{
-                animate:true,
-                duration:0.6
-            });
+            if (map.getZoom() < 15) {
+            map.flyTo([lat, lng], 15, {
+            animate: true,
+            duration: 0.6
+        });
+    }
 
             const statusClass =
                 item["TINDAK LANJUT"] === "SUDAH TINDAK LANJUT"
@@ -1112,3 +1224,32 @@ function lihatFoto(src){
     modal.show();
 
 }
+
+// ============================
+// RESET FILTER
+// ============================
+
+document.getElementById("resetFilter").addEventListener("click", function(){
+
+    // Reset semua dropdown
+    document.getElementById("filterUP3").selectedIndex = 0;
+    document.getElementById("filterULP").selectedIndex = 0;
+    document.getElementById("filterGI").selectedIndex = 0;
+    document.getElementById("filterTL").selectedIndex = 0;
+
+    // Isi ulang dropdown agar ULP & GI kembali lengkap
+    isiFilter(semuaData);
+
+    // Kosongkan panel detail
+    document.getElementById("detail").innerHTML = `
+        <div class="detail-empty">
+            <i class="bi bi-geo-alt"></i>
+            <p>Belum Ada Data Dipilih</p>
+            <small>Klik salah satu marker pada peta untuk menampilkan informasi gangguan.</small>
+        </div>
+    `;
+
+    // Tampilkan seluruh dashboard
+    updateDashboard(semuaData);
+
+});

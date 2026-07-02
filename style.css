@@ -854,3 +854,8 @@ img{
     color:#FFC107;
     font-weight:700;
 }
+
+#resetFilter{
+    position: relative;
+    z-index: 9999;
+}
