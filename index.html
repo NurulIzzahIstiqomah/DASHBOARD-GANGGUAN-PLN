@@ -78,27 +78,33 @@
 
 </div>
 
+<!-- ======================================================
+                        HEADER
+======================================================= -->
+
 <!-- ===========================
      CONTAINER
 ============================ -->
 
 <div class="container-fluid p-4">
 
-<!-- ======================================================
-                        HEADER
-======================================================= -->
-
-<div class="container-fluid px-4 pt-4">
+    <!-- ===========================
+         HEADER
+    ============================ -->
 
     <div class="dashboard-header">
 
         <!-- Logo + Judul -->
         <div class="header-left">
 
-            <img
-                src="assets/logo-pln.png"
-                alt="Logo PLN"
-                class="logo-pln">
+            <div class="logo-box">
+
+                <img
+                    src="assets/logo-pln.png"
+                    alt="Logo PLN"
+                    class="logo-pln">
+
+            </div>
 
             <div class="header-title">
 
@@ -129,20 +135,6 @@
 
             <div class="header-box">
 
-                <i class="bi bi-database-fill"></i>
-
-                <div>
-
-                    <small>Total Data</small>
-
-                    <strong id="jumlahData">0</strong>
-
-                </div>
-
-            </div>
-
-            <div class="header-box">
-
                 <i class="bi bi-geo-alt-fill"></i>
 
                 <div>
@@ -159,95 +151,90 @@
 
     </div>
 
-</div>
+    <!-- ======================================================
+                            KPI
+    ======================================================= -->
 
-<!-- ======================================================
-                        KPI
-======================================================= -->
+    <div class="row g-4 mt-0 mb-4">
 
-<div class="row g-4 mt-2 mb-4">
+        <!-- Total Gangguan -->
+        <div class="col">
 
-    <!-- Total Gangguan -->
+            <div class="kpi-card kpi-blue">
 
-    <div class="col-xl col-lg-6 col-md-6">
+                <div class="kpi-icon">
 
-        <div class="kpi-card kpi-blue">
+                    <i class="bi bi-lightning-charge-fill"></i>
 
-            <div class="kpi-icon">
+                </div>
 
-                <i class="bi bi-lightning-charge-fill"></i>
+                <div class="kpi-content">
 
-            </div>
+                    <span>Total Gangguan</span>
 
-            <div class="kpi-content">
+                    <h2 id="totalGangguan">0</h2>
 
-                <span>Total Gangguan</span>
+                    <small>Jumlah gangguan tercatat</small>
 
-                <h2 id="totalGangguan">0</h2>
-
-                <small>Jumlah gangguan tercatat</small>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- Sudah Tindak Lanjut -->
-
-    <div class="col-xl col-lg-6 col-md-6">
-
-        <div class="kpi-card kpi-green">
-
-            <div class="kpi-icon">
-
-                <i class="bi bi-check-circle-fill"></i>
-
-            </div>
-
-            <div class="kpi-content">
-
-                <span>Sudah Tindak Lanjut</span>
-
-                <h2 id="sudahTL">0</h2>
-
-                <small>Status selesai</small>
+                </div>
 
             </div>
 
         </div>
 
-    </div>
+        <!-- Sudah Tindak Lanjut -->
+        <div class="col">
 
-    <!-- Belum Tindak Lanjut -->
+            <div class="kpi-card kpi-green">
 
-    <div class="col-xl col-lg-6 col-md-6">
+                <div class="kpi-icon">
 
-        <div class="kpi-card kpi-orange">
+                    <i class="bi bi-check-circle-fill"></i>
 
-            <div class="kpi-icon">
+                </div>
 
-                <i class="bi bi-exclamation-circle-fill"></i>
+                <div class="kpi-content">
 
-            </div>
+                    <span>Sudah Tindak Lanjut</span>
 
-            <div class="kpi-content">
+                    <h2 id="sudahTL">0</h2>
 
-                <span>Belum Tindak Lanjut</span>
+                    <small>Status selesai</small>
 
-                <h2 id="belumTL">0</h2>
-
-                <small>Perlu penanganan</small>
+                </div>
 
             </div>
 
         </div>
 
-    </div>
+        <!-- Belum Tindak Lanjut -->
+        <div class="col">
+
+            <div class="kpi-card kpi-orange">
+
+                <div class="kpi-icon">
+
+                    <i class="bi bi-exclamation-circle-fill"></i>
+
+                </div>
+
+                <div class="kpi-content">
+
+                    <span>Belum Tindak Lanjut</span>
+
+                    <h2 id="belumTL">0</h2>
+
+                    <small>Perlu penanganan</small>
+
+                </div>
+
+            </div>
+
+        </div>
 
     <!-- ENS -->
 
-    <div class="col-xl col-lg-6 col-md-6">
+    <div class="col">
 
         <div class="kpi-card kpi-purple">
 
@@ -273,7 +260,7 @@
 
     <!-- Gardu Induk -->
 
-    <div class="col-xl col-lg-6 col-md-6">
+    <div class="col">
 
         <div class="kpi-card kpi-red">
 
@@ -548,7 +535,7 @@
 
             <i class="bi bi-buildings-fill"></i>
 
-            <span>Top 10 UP3 Gangguan</span>
+            <span> Peringkat Gangguan UP3</span>
 
         </div>
 
@@ -587,6 +574,8 @@
         </div>
 
     </div>
+
+</div>
 
 </div>
 
@@ -683,6 +672,8 @@
         </div>
 
     </div>
+
+</div>
 
 </div>
 

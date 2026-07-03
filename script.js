@@ -35,9 +35,9 @@ const markers = L.markerClusterGroup({
 
     zoomToBoundsOnClick: true,
 
-    spiderfyOnMaxZoom: true,
+    spiderfyOnMaxZoom: false,
 
-    disableClusteringAtZoom: 18
+    disableClusteringAtZoom: 16
 
 });
 

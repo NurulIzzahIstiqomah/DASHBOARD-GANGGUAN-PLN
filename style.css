@@ -32,11 +32,7 @@ body{
 
 .dashboard-header{
 
-    background:linear-gradient(90deg,#005BAC,#0A6FD6);
-
-    border-radius:18px;
-
-    padding:25px 35px;
+    width:100%;
 
     display:flex;
 
@@ -44,7 +40,15 @@ body{
 
     align-items:center;
 
-    box-shadow:0 10px 30px rgba(0,0,0,.12);
+    background:linear-gradient(135deg,#005BAC,#1E73D8);
+
+    border-radius:18px;
+
+    padding:18px 24px;
+
+    margin-bottom:15px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.12);
 
 }
 
@@ -54,35 +58,45 @@ body{
 
     align-items:center;
 
-    gap:22px;
+    gap:35px;
+
+    flex:1;
+
+    min-width:0;
 
 }
 
-.logo-pln{
+.header-title{
 
-    width:80px;
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
 
 }
 
 .header-title h2{
 
-    color:white;
+    margin:0;
 
-    font-size:32px;
+    color:#fff;
+
+    font: size 35px;
 
     font-weight:700;
 
-    margin-bottom:4px;
+    line-height:1.2;
 
 }
 
 .header-title p{
 
+    margin:4px 0 0;
+
     color:#D9ECFF;
 
-    margin:0;
-
-    font-size:15px;
+    font-size:13px;
 
 }
 
@@ -90,9 +104,11 @@ body{
 
     display:flex;
 
-    gap:18px;
-
     align-items:center;
+
+    gap:14px;
+
+    flex-shrink:0;
 
 }
 
@@ -104,7 +120,7 @@ body{
 
     border-radius:12px;
 
-    padding:12px 18px;
+    padding:10px 16px;
 
     color:white;
 
@@ -118,7 +134,7 @@ body{
 
 .header-box i{
 
-    font-size:28px;
+    font-size:24px;
 
 }
 
@@ -142,23 +158,29 @@ body{
 
 .kpi-card{
 
-    background:white;
+    background:#fff;
 
-    border-radius:18px;
+    border-radius:20px;
 
-    padding:22px;
+    padding:26px;
+
+    min-height:220px;
+
+    height:100%;
 
     display:flex;
 
-    align-items:center;
+    flex-direction:column;
+
+    align-items:flex-start;
+
+    justify-content:flex-start;
 
     gap:18px;
 
-    transition:.25s;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
 
-    box-shadow:0 5px 20px rgba(0,0,0,.08);
-
-    height:100%;
+    transition:.3s;
 
 }
 
@@ -170,11 +192,26 @@ body{
 
 .kpi-icon{
 
-    width:65px;
+    width:72px;
+    height:72px;
 
-    height:65px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
 
     border-radius:18px;
+
+    color:#fff;
+
+    font-size:34px;
+
+    flex-shrink:0;
+
+    margin:0 auto;
+
+}
+
+.kpi-icon i{
 
     display:flex;
 
@@ -182,33 +219,53 @@ body{
 
     align-items:center;
 
-    font-size:30px;
+    line-height:1;
 
-    color:white;
+}
+
+.kpi-content{
+
+    width:100%;
+
+    display:flex;
+
+    flex-direction:column;
 
 }
 
 .kpi-content span{
 
-    font-size:14px;
+    font-size:18px;
 
-    color:#64748B;
+    font-weight:680;
+
+    color:#4B5563;
+
+    min-height:52px;
+
+    display:flex;
+
+    align-items:flex-end;
 
 }
 
 .kpi-content h2{
 
-    font-size:34px;
+    font-size:48px;
 
     font-weight:700;
 
-    margin:4px 0;
+    margin:8px 0;
+
+    line-height:1.1;
 
 }
 
 .kpi-content small{
 
-    color:#94A3B8;
+    font-size:14px;
+
+    color:#7C8799;
 
 }
 
@@ -546,7 +603,7 @@ canvas{
 
 .insight-box{
 
-    background:linear-gradient(135deg,#005BAC,#0A6FD6);
+    background:linear-gradient(135deg,#005BAC,#1976D2);
 
     color:white;
 
@@ -773,9 +830,11 @@ img{
 
     .logo-pln{
 
-        width:60px;
+    width:60px;
 
-    }
+    height:auto;
+
+}
 
     .header-title h2{
 
@@ -845,10 +904,6 @@ img{
 
 }
 
-.logo-pln{
-    width:70px;
-    height:auto;
-}
 
 #insightText b{
     color:#FFC107;
@@ -875,5 +930,30 @@ img{
         drop-shadow(0 0 20px rgba(0,91,172,.5));
 
     z-index: 1000 !important;
+
+}
+
+.logo-box{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    flex-shrink:0;
+
+}
+
+.logo-pln{
+
+    width:170px;
+    height:170px;
+
+    object-fit:contain;
+
+    border-radius:0;
+
+    display:block;
 
 }
