@@ -176,7 +176,7 @@ body{
 
     justify-content:flex-start;
 
-    gap:18px;
+    gap:10px;
 
     box-shadow:0 10px 25px rgba(0,0,0,.08);
 
@@ -192,8 +192,8 @@ body{
 
 .kpi-icon{
 
-    width:72px;
-    height:72px;
+    width:65px;
+    height:65px;
 
     display:flex;
     justify-content:center;
@@ -231,27 +231,31 @@ body{
 
     flex-direction:column;
 
+    text-align:center;
+
 }
 
 .kpi-content span{
 
+    display:block;
+
+    width:100%;
+
+    text-align:center;
+
     font-size:18px;
 
-    font-weight:680;
+    font-weight:700;
 
     color:#4B5563;
 
-    min-height:52px;
-
-    display:flex;
-
-    align-items:flex-end;
+    min-height:2px;
 
 }
 
 .kpi-content h2{
 
-    font-size:48px;
+    font-size:24px;
 
     font-weight:700;
 
@@ -908,11 +912,6 @@ img{
 #insightText b{
     color:#FFC107;
     font-weight:700;
-}
-
-#resetFilter{
-    position: relative;
-    z-index: 9999;
 }
 
 /* Marker aktif */
