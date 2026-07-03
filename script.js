@@ -237,6 +237,27 @@ function tampilKPI(data){
 
 }
 
+function formatTanggalIndonesia(tanggal){
+
+    if(!tanggal) return "-";
+
+    const bagian = tanggal.split("/");
+
+    if(bagian.length !== 3) return tanggal;
+
+    const bulan = [
+        "Januari","Februari","Maret","April","Mei","Juni",
+        "Juli","Agustus","September","Oktober","November","Desember"
+    ];
+
+    const hari = parseInt(bagian[1]);
+    const namaBulan = bulan[parseInt(bagian[0]) - 1];
+    const tahun = bagian[2];
+
+    return `${hari} ${namaBulan} ${tahun}`;
+
+}
+
 // ============================
 // CHART GANGGUAN BULANAN
 // ============================
@@ -992,7 +1013,7 @@ function tampilInsight(data){
         `Berdasarkan seluruh data gangguan yang tersedia, terdapat <b>${total.toLocaleString("id-ID")}</b> gangguan pada jaringan distribusi.`;
 
     }
-    
+
     // ==========================
     // Insight Dinamis
     // ==========================
@@ -1362,7 +1383,7 @@ function tampilMarker(data){
 
                     <div class="detail-item">
                         <div class="detail-label">📅 Tanggal</div>
-                        <div class="detail-value">${item.Tanggal}</div>
+                        <div class="detail-value">${formatTanggalIndonesia(item.Tanggal)}</div>
                     </div>
 
                     <div class="detail-item">
