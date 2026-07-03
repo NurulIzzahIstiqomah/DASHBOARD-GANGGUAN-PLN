@@ -51,12 +51,15 @@ map.addLayer(markers);
 let semuaData = [];
 let semuaMarker = [];
 let markerAktif = null;
+let tanggalAwal = null;
+let tanggalAkhir = null;
 
 let chartBulanan = null;
 let chartPenyebab = null;
 let chartUP3 = null;
 let chartGI = null;
 let tabelGangguan = null;
+
 
 // ============================
 // Warna Dashboard
@@ -110,6 +113,49 @@ fetch("dashboard_data.json")
     })
     .catch(err => console.error(err));
 
+    // ============================
+    // Date Range Picker
+    // ============================
+    $('#btnTanggal').daterangepicker({
+
+        autoUpdateInput: false,
+
+        opens: 'right',
+
+        locale: {
+
+            format: 'DD MMM YYYY',
+
+            applyLabel: 'Terapkan',
+
+            cancelLabel: 'Batal'
+
+        }
+
+    }, function(start, end){
+
+        tanggalAwal = start.toDate();
+
+        tanggalAkhir = end.toDate();
+
+        document.getElementById("tanggalTerpilih").textContent =
+            start.format("DD MMM YYYY") + " - " +
+            end.format("DD MMM YYYY");
+
+        filterData();
+
+    });
+
+    $('#btnTanggal').on('cancel.daterangepicker', function () {
+
+    tanggalAwal = null;
+    tanggalAkhir = null;
+
+    document.getElementById("tanggalTerpilih").textContent = "Semua Periode";
+
+    filterData();
+
+});
 // ============================
 // KPI
 // ============================
@@ -809,16 +855,12 @@ function tampilChartGI(data){
 
 function tampilInsight(data){
 
-    const insight = document.getElementById("insightText");
-
-    if(!insight) return;
-
     const total = data.length;
 
     if(total === 0){
 
-        insight.innerHTML =
-        "Tidak ada data yang sesuai dengan filter yang dipilih.";
+        document.getElementById("insightText").innerHTML =
+        "Tidak terdapat data gangguan yang sesuai dengan filter yang dipilih. Silakan ubah periode atau kriteria filter untuk menampilkan data lainnya.";
 
         return;
 
@@ -833,12 +875,13 @@ function tampilInsight(data){
     data.forEach(item => {
 
         const nama = item.UP3 || "-";
+
         up3[nama] = (up3[nama] || 0) + 1;
 
     });
 
     const topUP3 = Object.entries(up3)
-        .sort((a,b) => b[1]-a[1])[0];
+        .sort((a,b)=>b[1]-a[1])[0];
 
     // ==========================
     // GI Terbanyak
@@ -849,6 +892,7 @@ function tampilInsight(data){
     data.forEach(item => {
 
         const nama = item["Gardu Induk"] || "-";
+
         gi[nama] = (gi[nama] || 0) + 1;
 
     });
@@ -878,40 +922,112 @@ function tampilInsight(data){
     // ==========================
 
     const belum = data.filter(item =>
-
         item["TINDAK LANJUT"] === "BELUM TINDAK LANJUT"
-
     ).length;
 
     const persen = ((belum / total) * 100).toFixed(1);
 
     // ==========================
-    // Tampilkan Insight
+    // Kesimpulan Dinamis
     // ==========================
 
-    insight.innerHTML = `
-        Berdasarkan filter yang dipilih, terdapat
-        <strong>${total.toLocaleString("id-ID")}</strong> gangguan pada jaringan distribusi.
-        Gangguan paling banyak terjadi di
-        <strong>${topUP3[0]}</strong> sebanyak
-        <strong>${topUP3[1]}</strong> kejadian.
+    let kesimpulan = "";
 
-        Gardu Induk dengan jumlah gangguan tertinggi adalah
-        <strong>${topGI[0]}</strong> sebanyak
-        <strong>${topGI[1]}</strong> kejadian.
+    if(belum === 0){
 
-        Penyebab gangguan yang paling dominan adalah
-        <strong>${topPenyebab[0]}</strong> dengan
-        <strong>${topPenyebab[1]}</strong> kejadian.
+        kesimpulan =
+        "Seluruh gangguan pada hasil filter telah berhasil ditindaklanjuti sehingga tidak terdapat pekerjaan yang masih memerlukan penanganan lebih lanjut.";
 
-        Dari seluruh gangguan tersebut terdapat
-        <strong>${belum}</strong> gangguan
-        (<strong>${persen}%</strong>)
-        yang masih berstatus
-        <strong>Belum Tindak Lanjut</strong>
-        sehingga perlu menjadi prioritas penanganan.
-    `;
+    }
+    else if(persen <= 10){
 
+        kesimpulan =
+        `Terdapat <b>${belum}</b> gangguan (<b>${persen}%</b>) yang masih berstatus <b>Belum Tindak Lanjut</b>. Meskipun jumlahnya relatif kecil, gangguan tersebut tetap perlu segera ditindaklanjuti untuk menjaga keandalan jaringan distribusi.`;
+
+    }
+    else if(persen <= 30){
+
+        kesimpulan =
+        `Masih terdapat <b>${belum}</b> gangguan (<b>${persen}%</b>) yang berstatus <b>Belum Tindak Lanjut</b>. Kondisi ini menunjukkan masih terdapat pekerjaan yang perlu diprioritaskan agar proses penanganan gangguan dapat diselesaikan secara optimal.`;
+
+    }
+    else{
+
+        kesimpulan =
+        `Sebanyak <b>${belum}</b> gangguan (<b>${persen}%</b>) masih berstatus <b>Belum Tindak Lanjut</b>. Persentase tersebut tergolong cukup tinggi sehingga diperlukan percepatan tindak lanjut untuk meningkatkan keandalan sistem distribusi listrik.`;
+
+    }
+
+    // ==========================
+    // Filter Aktif
+    // ==========================
+
+    const filterUP3 = document.getElementById("filterUP3").value;
+    const filterULP = document.getElementById("filterULP").value;
+    const filterGI = document.getElementById("filterGI").value;
+
+    let pembuka = "";
+
+    if(tanggalAwal && tanggalAkhir){
+
+        const awal = tanggalAwal.toLocaleDateString("id-ID", {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        });
+
+        const akhir = tanggalAkhir.toLocaleDateString("id-ID", {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        });
+
+        pembuka =
+        `Berdasarkan data gangguan pada periode <b>${awal}</b> hingga <b>${akhir}</b>, terdapat <b>${total.toLocaleString("id-ID")}</b> gangguan pada jaringan distribusi.`;
+
+    }
+    else{
+
+        pembuka =
+        `Berdasarkan seluruh data gangguan yang tersedia, terdapat <b>${total.toLocaleString("id-ID")}</b> gangguan pada jaringan distribusi.`;
+
+    }
+    
+    // ==========================
+    // Insight Dinamis
+    // ==========================
+
+    let isiInsight = pembuka;
+
+    // Jika tidak memilih UP3
+    if(filterUP3 === ""){
+
+        isiInsight += ` Gangguan paling banyak terjadi di <b>${topUP3[0]}</b> sebanyak <b>${topUP3[1]}</b> kejadian.`;
+
+    }
+    else{
+
+        isiInsight += ` Analisis dilakukan pada wilayah <b>UP3 ${filterUP3}</b>.`;
+
+    }
+
+    // Jika tidak memilih GI
+    if(filterGI === ""){
+
+        isiInsight += ` Gardu Induk dengan jumlah gangguan tertinggi adalah <b>${topGI[0]}</b> sebanyak <b>${topGI[1]}</b> kejadian.`;
+
+    }
+    else{
+
+        isiInsight += ` Analisis difokuskan pada <b>Gardu Induk ${filterGI}</b>.`;
+
+    }
+
+    isiInsight += ` Penyebab gangguan yang paling dominan adalah <b>${topPenyebab[0]}</b> dengan <b>${topPenyebab[1]}</b> kejadian.`;
+
+    isiInsight += ` ${kesimpulan}`;
+
+    document.getElementById("insightText").innerHTML = isiInsight;
 }
 
 // ============================
@@ -1277,6 +1393,27 @@ function tampilMarker(data){
 }
 
 // ============================
+// Tanggal
+// ============================
+function parseTanggal(teks){
+
+    if(!teks) return null;
+
+    const bagian = teks.split("/");
+
+    return new Date(
+
+        Number(bagian[2]),
+
+        Number(bagian[0]) - 1,
+
+        Number(bagian[1])
+
+    );
+
+}
+
+// ============================
 // FILTER DATA
 // ============================ 
 function filterData(){
@@ -1287,8 +1424,21 @@ function filterData(){
     const tl = document.getElementById("filterTL").value;
 
     const hasil = semuaData.filter(item => {
+    const tanggalData = parseTanggal(item.Tanggal);
 
-        return (
+        let lolosTanggal = true;
+
+        if(tanggalAwal && tanggalAkhir){
+
+            lolosTanggal =
+                tanggalData >= tanggalAwal &&
+                tanggalData <= tanggalAkhir;
+
+        }
+
+       return(
+
+            lolosTanggal &&
 
             (up3 === "" || item.UP3 === up3) &&
 
@@ -1443,6 +1593,21 @@ document.getElementById("resetFilter").addEventListener("click", function(){
     document.getElementById("filterGI").selectedIndex = 0;
     document.getElementById("filterTL").selectedIndex = 0;
 
+    // ============================
+    // Reset Filter Tanggal
+    // ============================
+
+    tanggalAwal = null;
+    tanggalAkhir = null;
+
+    document.getElementById("tanggalTerpilih").textContent = "Semua Periode";
+
+    // Reset tampilan Date Range Picker
+    const picker = $('#btnTanggal').data('daterangepicker');
+
+    picker.setStartDate(moment());
+    picker.setEndDate(moment());
+
     // Isi ulang dropdown agar ULP & GI kembali lengkap
     isiFilter(semuaData);
 
@@ -1465,3 +1630,4 @@ document.getElementById("resetFilter").addEventListener("click", function(){
     });
 
 });
+

@@ -956,3 +956,51 @@ img{
     display:block;
 
 }
+
+.filter-date{
+
+    height:48px;
+
+    border:1px solid #CED4DA;
+
+    border-radius:12px;
+
+    padding:0 16px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    cursor:pointer;
+
+    background:#fff;
+
+    margin-bottom:16px;
+
+    transition:.25s;
+
+}
+
+.filter-date:hover{
+
+    border-color:#005BAC;
+
+}
+
+.filter-date span{
+
+    color:#212529;
+
+    font-size:15px;
+
+}
+
+.filter-date i{
+
+    color:#6C757D;
+
+    font-size:14px;
+
+}

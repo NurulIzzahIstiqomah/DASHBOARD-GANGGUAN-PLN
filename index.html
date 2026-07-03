@@ -33,6 +33,9 @@
 
     <!-- CSS Dashboard -->
     <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css">
 </head>
 
 <body>
@@ -287,7 +290,6 @@
 <!-- ======================================================
                     MAIN DASHBOARD
 ======================================================= -->
-
 <div class="row g-4">
 
     <!-- ================= FILTER ================= -->
@@ -306,6 +308,28 @@
 
             <hr>
 
+            <!-- ================= PERIODE TANGGAL ================= -->
+
+           <label class="filter-label">
+
+                    Periode Tanggal
+
+                </label>
+
+                <div id="btnTanggal" class="filter-date">
+
+                    <span id="tanggalTerpilih">
+
+                        Semua Periode
+
+                    </span>
+
+                    <i class="bi bi-chevron-down"></i>
+
+                </div>
+
+            <!-- ================= UP3 ================= -->
+
             <label class="filter-label">
 
                 UP3
@@ -321,6 +345,8 @@
                 </option>
 
             </select>
+
+            <!-- ================= ULP ================= -->
 
             <label class="filter-label">
 
@@ -338,6 +364,8 @@
 
             </select>
 
+            <!-- ================= GI ================= -->
+
             <label class="filter-label">
 
                 Gardu Induk
@@ -353,6 +381,8 @@
                 </option>
 
             </select>
+
+            <!-- ================= TINDAK LANJUT ================= -->
 
             <label class="filter-label">
 
@@ -384,7 +414,7 @@
         </div>
 
     </div>
-
+         
     <!-- ================= MAP ================= -->
 
     <div class="col-xl-7">
@@ -698,8 +728,13 @@
 
 <!-- DataTables -->
 <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
-
 <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+
+<!-- Moment -->
+<script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
+
+<!-- Date Range Picker -->
+<script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
 <!-- Script Dashboard -->
 <script src="script.js"></script>
