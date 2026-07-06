@@ -60,6 +60,7 @@ let chartUP3 = null;
 let chartGI = null;
 let tabelGangguan = null;
 
+Chart.register(ChartDataLabels);
 
 // ============================
 // Warna Dashboard
@@ -268,7 +269,10 @@ function tampilChartBulanan(data){
 
     if(!canvas) return;
 
+    // ============================
     // Hitung jumlah gangguan tiap bulan
+    // ============================
+
     const jumlah = Array(12).fill(0);
 
     data.forEach(item => {
@@ -277,7 +281,6 @@ function tampilChartBulanan(data){
 
         const tgl = item.Tanggal.split("/");
 
-        // Pastikan format tanggal benar (MM/DD/YYYY)
         if(tgl.length !== 3) return;
 
         const bulan = Number(tgl[0]);
@@ -290,13 +293,22 @@ function tampilChartBulanan(data){
 
     });
 
-    // Nama bulan
+    // ============================
+    // Nama Bulan
+    // ============================
+
     const namaBulan = [
+
         "Jan","Feb","Mar","Apr","Mei","Jun",
+
         "Jul","Agu","Sep","Okt","Nov","Des"
+
     ];
 
-    // Cari bulan terakhir yang memiliki data
+    // ============================
+    // Ambil bulan terakhir yang memiliki data
+    // ============================
+
     let bulanTerakhir = -1;
 
     for(let i = 11; i >= 0; i--){
@@ -304,13 +316,13 @@ function tampilChartBulanan(data){
         if(jumlah[i] > 0){
 
             bulanTerakhir = i;
+
             break;
 
         }
 
     }
 
-    // Kalau tidak ada data
     if(bulanTerakhir === -1){
 
         bulanTerakhir = 0;
@@ -318,41 +330,80 @@ function tampilChartBulanan(data){
     }
 
     const labels = namaBulan.slice(0, bulanTerakhir + 1);
+
     const values = jumlah.slice(0, bulanTerakhir + 1);
 
-    // Update chart jika sudah ada
+    // ============================
+    // Cari nilai maksimum
+    // ============================
+
+    const nilaiMaks = Math.max(...values);
+
+    const warnaTitik = values.map(v =>
+
+        v === nilaiMaks ? "#DC3545" : "#005BAC"
+
+    );
+
+    // ============================
+    // Update Chart
+    // ============================
+
     if(chartBulanan){
 
         chartBulanan.data.labels = labels;
+
         chartBulanan.data.datasets[0].data = values;
+
+        chartBulanan.data.datasets[0].pointBackgroundColor = warnaTitik;
+
         chartBulanan.update();
 
         return;
 
     }
 
-    // Buat chart pertama kali
+    // ============================
+    // Buat Chart
+    // ============================
+
     chartBulanan = new Chart(canvas,{
 
-        type:"bar",
+        type:"line",
 
         data:{
 
-            labels: labels,
+            labels:labels,
 
-            datasets:[{
+        datasets:[{
 
-                label:"Jumlah Gangguan",
+            label:"Jumlah Gangguan",
 
-                data: values,
+            data:values,
 
-                backgroundColor:"#005BAC",
+            borderColor:"#005BAC",
 
-                borderRadius:8,
+            borderWidth:3,
 
-                maxBarThickness:40
+            tension:0.15,
 
-            }]
+            fill:false,
+
+            pointRadius:7,
+
+            pointHoverRadius:10,
+
+            pointBackgroundColor:warnaTitik,
+
+            pointBorderColor:"#FFFFFF",
+
+            pointBorderWidth:3,
+
+            pointHoverBorderWidth:4,
+
+            pointHitRadius:15
+
+        }]
 
         },
 
@@ -362,29 +413,135 @@ function tampilChartBulanan(data){
 
             maintainAspectRatio:false,
 
+            interaction:{
+
+                mode:"index",
+
+                intersect:false
+
+            },
+
+            animation:{
+
+                duration:900,
+
+                easing:"easeOutQuart"
+
+            },
+
             plugins:{
 
                 legend:{
+
                     display:false
+
+                },
+
+                tooltip:{
+
+                    backgroundColor:"#1F2937",
+
+                    titleColor:"#FFFFFF",
+
+                    bodyColor:"#FFFFFF",
+
+                    displayColors:false,
+
+                    callbacks:{
+
+                        label:function(context){
+
+                            return context.parsed.y.toLocaleString("id-ID") + " Gangguan";
+
+                        }
+
+                    }
+
+                },
+
+                datalabels:{
+
+                    color:"#374151",
+
+                    anchor:"end",
+
+                    align:"top",
+
+                    font:{
+
+                        size:11,
+
+                        weight:"bold"
+
+                    },
+
+                    formatter:function(value){
+
+                        return value;
+
+                    }
+
                 }
 
             },
 
             scales:{
 
+                x:{
+
+                    grid:{
+
+                        display:false
+
+                    },
+
+                    ticks:{
+
+                        color:"#6B7280",
+
+                        font:{
+
+                            size:12,
+
+                            weight:"600"
+
+                        }
+
+                    }
+
+                },
+
                 y:{
 
                     beginAtZero:true,
 
                     ticks:{
-                        precision:0
+
+                        precision:0,
+
+                        color:"#6B7280",
+
+                        callback:function(value){
+
+                            return value.toLocaleString("id-ID");
+
+                        }
+
+                    },
+
+                    grid:{
+
+                        color:"rgba(0,0,0,.08)"
+
                     }
 
                 }
 
             }
 
-        }
+        },
+
+        plugins:[ChartDataLabels]
 
     });
 
