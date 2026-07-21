@@ -1143,7 +1143,7 @@ function tampilInsight(data){
 
     data.forEach(item => {
 
-        const nama = kategoriPenyebab(item);
+        const nama =  item["Kelompok Penyebab"] || "Tidak Diketahui";
 
         penyebab[nama] = (penyebab[nama] || 0) + 1;
 
@@ -1197,12 +1197,12 @@ function tampilInsight(data){
     // Filter Aktif
     // ==========================
 
-    const filterUP3 = document.getElementById("filterUP3");
-    const filterULP = document.getElementById("filterULP");
-    const filterGI = document.getElementById("filterGI");
-    const filterPenyulang = document.getElementById("filterPenyulang");
-    const filterKelompok = document.getElementById("filterKelompok");
-    const filterTL = document.getElementById("filterTL");
+    const filterUP3 = document.getElementById("filterUP3").value;
+    const filterULP = document.getElementById("filterULP").value;
+    const filterGI = document.getElementById("filterGI").value;
+    const filterPenyulang = document.getElementById("filterPenyulang").value;
+    const filterKelompok = document.getElementById("filterKelompok").value;
+    const filterTL = document.getElementById("filterTL").value;
 
     let pembuka = "";
 
@@ -1619,6 +1619,9 @@ function tampilMarker(data){
             icon: iconNormal
         });
 
+        console.log(Object.keys(item));
+        console.log("Penyulang:", item.Penyulang);
+
         marker.bindTooltip(
             `<b>${item.Penyulang}</b><br>${item.UP3} - ${item.ULP}`,
             {
@@ -1967,6 +1970,8 @@ document.getElementById("resetFilter").addEventListener("click", function(){
     document.getElementById("filterULP").selectedIndex = 0;
     document.getElementById("filterGI").selectedIndex = 0;
     document.getElementById("filterTL").selectedIndex = 0;
+    document.getElementById("filterPenyulang").selectedIndex = 0;
+    document.getElementById("filterKelompok").selectedIndex = 0;
 
     // ============================
     // Reset Filter Tanggal
