@@ -1,6 +1,33 @@
-// ============================
-// Inisialisasi Peta
-// ============================
+/*
+==========================================================
+DAFTAR ISI
+
+1. Inisialisasi Peta
+2. Marker Cluster
+3. Variabel Global
+4. Warna Dashboard
+5. Update Dashboard
+6. Load Data
+7. KPI
+8. Utility Function
+9. Chart
+10. Quick Insight
+11. DataTable
+12. Filter
+13. Marker
+14. Event Listener
+15. Reset Filter
+
+==========================================================
+*/
+
+// =======================================================
+// DASHBOARD MONITORING GANGGUAN DISTRIBUSI PLN UID S2JB
+// =======================================================
+
+// =======================================================
+// 1. INISIALISASI PETA
+// =======================================================
 
 const map = L.map("map").setView([-3.2, 104.7], 7);
 
@@ -26,7 +53,7 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 }).addTo(map);
 
 // ============================
-// Marker Cluster
+// 2. Marker Cluster
 // ============================
 
 const markers = L.markerClusterGroup({
@@ -57,7 +84,7 @@ let tanggalAkhir = null;
 let chartBulanan = null;
 let chartPenyebab = null;
 let chartUP3 = null;
-let chartGI = null;
+let chartPenyulang = null;
 let tabelGangguan = null;
 
 Chart.register(ChartDataLabels);
@@ -80,20 +107,22 @@ const warnaPLN = {
 
 function updateDashboard(data){
 
+    // Ringkasan Dashboard
     tampilKPI(data);
 
+    // Peta Gangguan
     tampilMarker(data);
 
+    // Visualisasi
     tampilChartBulanan(data);
-
     tampilChartPenyebab(data);
-
     tampilChartUP3(data);
+    tampilChartPenyulang(data);
 
-    tampilChartGI(data);
-
+    // Insight
     tampilInsight(data);
 
+    // Tabel
     tampilTabel(data);
 }
 
@@ -101,7 +130,7 @@ function updateDashboard(data){
 // Ambil Data JSON
 // ============================
 
-fetch("dashboard_data.json")
+fetch("https://script.google.com/macros/s/AKfycbzE-ACX3ihGqOnsxR_nB_GOGgDtTWx886JfaXeCAd0o3BAtOhnkmCA16mFM8ei1G-Ry/exec")
     .then(res => res.json())
     .then(data => {
 
@@ -165,12 +194,12 @@ function tampilKPI(data){
 
     document.getElementById("totalGangguan").textContent = data.length;
 
-    const sudah = data.filter(item =>
-        item["TINDAK LANJUT"] === "SUDAH TINDAK LANJUT"
+    const sudah = data.filter(
+    item => item["TINDAK LANJUT"] === "SUDAH TINDAK LANJUT"
     ).length;
 
-    const belum = data.filter(item =>
-        item["TINDAK LANJUT"] === "BELUM TINDAK LANJUT"
+    const belum = data.filter(
+    item => item["TINDAK LANJUT"] === "BELUM TINDAK LANJUT"
     ).length;
 
     document.getElementById("sudahTL").textContent = sudah;
@@ -277,9 +306,9 @@ function tampilChartBulanan(data){
 
     data.forEach(item => {
 
-        if(!item.Tanggal) return;
+        if(!item["Tanggal Padam"]) return;
 
-        const tgl = item.Tanggal.split("/");
+        const tgl = item["Tanggal Padam"].split("/");
 
         if(tgl.length !== 3) return;
 
@@ -389,7 +418,7 @@ function tampilChartBulanan(data){
 
             fill:false,
 
-            pointRadius:7,
+            pointRadius:7,  
 
             pointHoverRadius:10,
 
@@ -461,15 +490,21 @@ function tampilChartBulanan(data){
 
                 datalabels:{
 
-                    color:"#374151",
+                    color:"#111827",
 
                     anchor:"end",
 
                     align:"top",
 
+                    offset:10,
+
+                    clamp:true,
+
+                    clip:false,
+
                     font:{
 
-                        size:11,
+                        size:12,
 
                         weight:"bold"
 
@@ -477,7 +512,7 @@ function tampilChartBulanan(data){
 
                     formatter:function(value){
 
-                        return value;
+                        return value.toLocaleString("id-ID");
 
                     }
 
@@ -679,7 +714,7 @@ function tampilChartPenyebab(data){
 
     data.forEach(item=>{
 
-        const penyebab = kategoriPenyebab(item);
+        const penyebab = item["Kelompok Penyebab"] || "Tidak Diketahui";
 
         hasil[penyebab] = (hasil[penyebab] || 0) + 1;
 
@@ -745,10 +780,34 @@ function tampilChartPenyebab(data){
 
             maintainAspectRatio:false,
 
+            layout:{
+                padding:{
+                    top:30
+                }
+
+            },
+
             plugins:{
 
                 legend:{
                     display:false
+                },
+
+                datalabels:{
+
+                    color:"#111827",
+
+                    anchor:"end",
+
+                    align:"end",
+
+                    offset:5,
+
+                    font:{
+                        size:12,
+                        weight:"bold"
+                    }
+
                 }
 
             },
@@ -763,9 +822,9 @@ function tampilChartPenyebab(data){
 
         }
 
-    });
+            });
 
-}
+        }
 
 // ============================
 // TOP 10 UP3
@@ -777,23 +836,22 @@ function tampilChartUP3(data){
 
     if(!canvas) return;
 
-    const hasil = {};
-
-    data.forEach(item=>{
+    const hasil = data.reduce((obj, item) => {
 
         const up3 = item.UP3 || "Tidak Diketahui";
 
-        hasil[up3] = (hasil[up3] || 0) + 1;
+        obj[up3] = (obj[up3] || 0) + 1;
 
-    });
+        return obj;
+
+    }, {});
 
     const urut = Object.entries(hasil)
-        .sort((a,b)=>b[1]-a[1])
-        .slice(0,10);
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10);
 
-    const labels = urut.map(item=>item[0]);
-
-    const values = urut.map(item=>item[1]);
+    const labels = urut.map(item => item[0]);
+    const values = urut.map(item => item[1]);
 
    if(chartUP3){
 
@@ -898,12 +956,12 @@ function tampilChartUP3(data){
 }
 
 // ============================
-// TOP 10 GARDU INDUK
+// TOP 10 PENYULANG
 // ============================
 
-function tampilChartGI(data){
+function tampilChartPenyulang(data){
 
-    const canvas = document.getElementById("chartGI");
+    const canvas = document.getElementById("chartPenyulang");
 
     if(!canvas) return;
 
@@ -911,9 +969,9 @@ function tampilChartGI(data){
 
     data.forEach(item=>{
 
-        const gi = item["Gardu Induk"] || "Tidak Diketahui";
+        const penyulang = item.Penyulang || "Tidak Diketahui";
 
-        hasil[gi] = (hasil[gi] || 0) + 1;
+        hasil[penyulang] = (hasil[penyulang] || 0) + 1;
 
     });
 
@@ -922,20 +980,19 @@ function tampilChartGI(data){
         .slice(0,10);
 
     const labels = urut.map(item=>item[0]);
-
     const values = urut.map(item=>item[1]);
 
-    if(chartGI){
+    if(chartPenyulang){
 
-    chartGI.data.labels = labels;
-    chartGI.data.datasets[0].data = values;
-    chartGI.update();
+        chartPenyulang.data.labels = labels;
+        chartPenyulang.data.datasets[0].data = values;
+        chartPenyulang.update();
 
-    return;
+        return;
 
     }
 
-    chartGI = new Chart(canvas,{
+    chartPenyulang = new Chart(canvas,{
 
         type:"bar",
 
@@ -949,9 +1006,9 @@ function tampilChartGI(data){
 
                 data:values,
 
-                backgroundColor:"#16A34A",
+                backgroundColor:"#F59E0B",
 
-                hoverBackgroundColor:"#22C55E",
+                hoverBackgroundColor:"#FBBF24",
 
                 borderRadius:10,
 
@@ -1011,7 +1068,7 @@ function tampilChartGI(data){
                     ticks:{
 
                         font:{
-                            size:13,
+                            size:12,
                             weight:"600"
                         }
 
@@ -1140,9 +1197,12 @@ function tampilInsight(data){
     // Filter Aktif
     // ==========================
 
-    const filterUP3 = document.getElementById("filterUP3").value;
-    const filterULP = document.getElementById("filterULP").value;
-    const filterGI = document.getElementById("filterGI").value;
+    const filterUP3 = document.getElementById("filterUP3");
+    const filterULP = document.getElementById("filterULP");
+    const filterGI = document.getElementById("filterGI");
+    const filterPenyulang = document.getElementById("filterPenyulang");
+    const filterKelompok = document.getElementById("filterKelompok");
+    const filterTL = document.getElementById("filterTL");
 
     let pembuka = "";
 
@@ -1268,7 +1328,7 @@ function tampilTabel(data){
 
             index+1,
 
-            item.Tanggal || "-",
+            item["Tanggal Padam"] || "-",
 
             item.Penyulang || "-",
 
@@ -1310,11 +1370,15 @@ function isiFilter(data){
     const filterUP3 = document.getElementById("filterUP3");
     const filterULP = document.getElementById("filterULP");
     const filterGI = document.getElementById("filterGI");
+    const filterPenyulang = document.getElementById("filterPenyulang");
+    const filterKelompok = document.getElementById("filterKelompok");
     const filterTL = document.getElementById("filterTL");
 
     filterUP3.innerHTML = '<option value="">Semua UP3</option>';
     filterULP.innerHTML = '<option value="">Semua ULP</option>';
     filterGI.innerHTML = '<option value="">Semua Gardu Induk</option>';
+    filterPenyulang.innerHTML ='<option value="">Semua Penyulang</option>';
+    filterKelompok.innerHTML = '<option value="">Semua Kelompok</option>';
     filterTL.innerHTML = '<option value="">Semua Tindak Lanjut</option>';
 
     // =====================
@@ -1352,6 +1416,32 @@ function isiFilter(data){
     .forEach(item=>{
 
         filterGI.innerHTML +=
+        `<option value="${item}">${item}</option>`;
+
+    });
+
+    // =====================
+    // Penyulang
+    // =====================
+
+    [...new Set(data.map(item => item.Penyulang).filter(Boolean))]
+    .sort()
+    .forEach(item=>{
+
+        filterPenyulang.innerHTML +=
+        `<option value="${item}">${item}</option>`;
+
+    });
+
+    // =====================
+    // Kelompok Penyebab
+    // =====================
+
+    [...new Set(data.map(item => item["Kelompok Penyebab"]).filter(Boolean))]
+    .sort()
+    .forEach(item => {
+
+        filterKelompok.innerHTML +=
         `<option value="${item}">${item}</option>`;
 
     });
@@ -1449,6 +1539,61 @@ function isiFilterGI(){
 }
 
 // ============================
+// FILTER PENYULANG BERDASARKAN
+// UP3 + ULP + GI
+// ============================
+
+function isiFilterPenyulang(){
+
+    const up3 = document.getElementById("filterUP3").value;
+    const ulp = document.getElementById("filterULP").value;
+    const gi = document.getElementById("filterGI").value;
+
+    const filterPenyulang =
+    document.getElementById("filterPenyulang");
+
+    filterPenyulang.innerHTML =
+    '<option value="">Semua Penyulang</option>';
+
+    let data = semuaData;
+
+    if(up3 !== ""){
+
+        data = data.filter(item => item.UP3 === up3);
+
+    }
+
+    if(ulp !== ""){
+
+        data = data.filter(item => item.ULP === ulp);
+
+    }
+
+    if(gi !== ""){
+
+        data = data.filter(item => item["Gardu Induk"] === gi);
+
+    }
+
+    const daftar =
+    [...new Set(
+
+        data
+        .map(item => item.Penyulang)
+        .filter(Boolean)
+
+    )].sort();
+
+    daftar.forEach(item=>{
+
+        filterPenyulang.innerHTML +=
+        `<option value="${item}">${item}</option>`;
+
+    });
+
+}
+
+// ============================
 // Marker
 // ============================
 function tampilMarker(data){
@@ -1511,17 +1656,38 @@ function tampilMarker(data){
 
                 <div class="detail-card">
 
-                    <div class="detail-title">${item.Penyulang}</div>
-
                     <div class="status ${statusClass}">
                         ${item["TINDAK LANJUT"]}
                     </div>
 
-                    <img
-                        class="detail-photo"
-                        src="${item.FOTO1}"
-                        onclick="lihatFoto('${item.FOTO1}')"
-                        onerror="this.style.display='none'">
+                    <div class="detail-item">
+                        <div class="detail-label">📷 Foto Sebelum</div>
+
+                        <img
+                            class="detail-photo"
+                            src="${item.FOTO1}"
+                            onclick="lihatFoto('${item.FOTO1}')"
+                            onerror="this.style.display='none'">
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">📷 Foto Sesudah</div>
+
+                        ${
+                            item.FOTO2
+                                ? `<img
+                                        class="detail-photo"
+                                        src="${item.FOTO2}"
+                                        onclick="lihatFoto('${item.FOTO2}')"
+                                        onerror="this.style.display='none'">`
+                                : `<div class="detail-value">Belum tersedia</div>`
+                        }
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">🔌 Penyulang</div>
+                        <div class="detail-value">${item.Penyulang || "-"}</div>
+                    </div>
 
                     <div class="detail-item">
                         <div class="detail-label">🏢 Gardu Induk</div>
@@ -1540,7 +1706,7 @@ function tampilMarker(data){
 
                     <div class="detail-item">
                         <div class="detail-label">📅 Tanggal</div>
-                        <div class="detail-value">${formatTanggalIndonesia(item.Tanggal)}</div>
+                        <div class="detail-value">${formatTanggalIndonesia(item["Tanggal Padam"])}</div>
                     </div>
 
                     <div class="detail-item">
@@ -1550,7 +1716,7 @@ function tampilMarker(data){
 
                     <div class="detail-item">
                         <div class="detail-label">⚠ Penyebab</div>
-                        <div class="detail-value">${item["Penyebab Padam"] || "-"}</div>
+                        <div class="detail-value">${item["Kelompok Penyebab"] || "-"}</div>
                     </div>
 
                     <div class="detail-item">
@@ -1558,6 +1724,16 @@ function tampilMarker(data){
                         <div class="detail-value">${item["JUSTIFIKASI TEMUAN GANGGUAN MELALUI APPSHEET"] || "-"}</div>
                     </div>
 
+                    <div class="detail-item">
+                    <div class="detail-label">📍 Koordinat</div>
+                    <div class="detail-value">
+                        <a
+                            href="https://www.google.com/maps?q=${item.Latitude},${item.Longitude}"
+                            target="_blank"
+                            style="text-decoration:none;color:#0d6efd;font-weight:500;">
+                            ${item.Latitude}, ${item.Longitude}
+                        </a>
+                    </div>
                 </div>
 
             `;
@@ -1599,10 +1775,12 @@ function filterData(){
     const up3 = document.getElementById("filterUP3").value;
     const ulp = document.getElementById("filterULP").value;
     const gi = document.getElementById("filterGI").value;
+    const penyulang = document.getElementById("filterPenyulang").value;
+    const kelompok = document.getElementById("filterKelompok").value;
     const tl = document.getElementById("filterTL").value;
 
     const hasil = semuaData.filter(item => {
-    const tanggalData = parseTanggal(item.Tanggal);
+    const tanggalData = parseTanggal(item["Tanggal Padam"]);
 
         let lolosTanggal = true;
 
@@ -1623,6 +1801,10 @@ function filterData(){
             (ulp === "" || item.ULP === ulp) &&
 
             (gi === "" || item["Gardu Induk"] === gi) &&
+
+            (penyulang === "" || item.Penyulang === penyulang) &&
+
+            (kelompok === "" || item["Kelompok Penyebab"]=== kelompok) &&
 
             (tl === "" || item["TINDAK LANJUT"] === tl)
 
@@ -1736,6 +1918,7 @@ document.getElementById("filterUP3").addEventListener("change", () => {
 
     isiFilterULP();
     isiFilterGI();
+    isiFilterPenyulang();
     filterData();
 
 });
@@ -1743,11 +1926,25 @@ document.getElementById("filterUP3").addEventListener("change", () => {
 document.getElementById("filterULP").addEventListener("change", () => {
 
     isiFilterGI();
+    isiFilterPenyulang();
     filterData();
 
 });
 
 document.getElementById("filterGI").addEventListener("change", () => {
+
+    isiFilterPenyulang();
+    filterData();
+
+});
+
+document.getElementById("filterPenyulang").addEventListener("change", () => {
+
+    filterData();
+
+});
+
+document.getElementById("filterKelompok").addEventListener("change", () => {
 
     filterData();
 

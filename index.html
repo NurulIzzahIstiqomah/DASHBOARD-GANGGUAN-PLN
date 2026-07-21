@@ -312,7 +312,7 @@
 
            <label class="filter-label">
 
-                    Periode Tanggal
+                    Tanggal
 
                 </label>
 
@@ -364,56 +364,82 @@
 
             </select>
 
-            <!-- ================= GI ================= -->
+    <!-- ================= GI ================= -->
 
-            <label class="filter-label">
+    <label class="filter-label">
+        Gardu Induk
+    </label>
 
-                Gardu Induk
+    <select
+        id="filterGI"
+        class="form-select mb-3">
 
-            </label>
+        <option value="">
+            Semua Gardu Induk
+        </option>
 
-            <select
-                id="filterGI"
-                class="form-select mb-3">
+    </select>
 
-                <option value="">
-                    Semua Gardu Induk
-                </option>
+    <!-- ================= PENYULANG ================= -->
 
-            </select>
+    <label class="filter-label">
+        Penyulang
+    </label>
 
-            <!-- ================= TINDAK LANJUT ================= -->
+    <select
+        id="filterPenyulang"
+        class="form-select mb-3">
 
-            <label class="filter-label">
+        <option value="">
+            Semua Penyulang
+        </option>
 
-                Tindak Lanjut
+    </select>
 
-            </label>
+    <!-- ================= KELOMPOK PENYEBAB ================= -->
 
-            <select
-                id="filterTL"
-                class="form-select mb-4">
+    <label class="filter-label">
+        Kelompok Penyebab
+    </label>
 
-                <option value="">
-                    Semua Status
-                </option>
+    <select
+        id="filterKelompok"
+        class="form-select mb-3">
 
-            </select>
+        <option value="">
+            Semua Kelompok
+        </option>
 
-            <button
-                type="button"
-                id="resetFilter"
-                class="btn btn-primary w-100">
+    </select>
 
-                <i class="bi bi-arrow-repeat"></i>
+    <!-- ================= TINDAK LANJUT ================= -->
 
-                Reset Filter
+    <label class="filter-label">
+        Tindak Lanjut
+    </label>
 
-            </button>
+    <select
+        id="filterTL"
+        class="form-select mb-4">
 
-        </div>
+        <option value="">
+            Semua Status
+        </option>
 
-    </div>
+</select>
+
+<button
+    id="resetFilter"
+    class="btn btn-primary w-100">
+
+    <i class="bi bi-arrow-repeat"></i>
+    Reset Filter
+
+</button>
+
+</div> 
+
+</div> 
          
     <!-- ================= MAP ================= -->
 
@@ -591,7 +617,7 @@
 
             <i class="bi bi-lightning-charge-fill"></i>
 
-            <span>Top 10 Gardu Induk</span>
+            <span>Top 10 Penyulang</span>
 
         </div>
 
@@ -599,7 +625,7 @@
 
         <div class="chart-container">
 
-            <canvas id="chartGI"></canvas>
+            <canvas id="chartPenyulang"></canvas>
 
         </div>
 
