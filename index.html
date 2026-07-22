@@ -124,20 +124,6 @@
 
             <div class="header-box">
 
-                <i class="bi bi-calendar3"></i>
-
-                <div>
-
-                    <small>Last Update</small>
-
-                    <strong id="lastUpdate">-</strong>
-
-                </div>
-
-            </div>
-
-            <div class="header-box">
-
                 <i class="bi bi-geo-alt-fill"></i>
 
                 <div>
@@ -160,30 +146,53 @@
 
     <div class="row g-4 mt-0 mb-4">
 
-        <!-- Total Gangguan -->
-        <div class="col">
+    <!-- Total Gangguan -->
+    <div class="col">
 
-            <div class="kpi-card kpi-blue">
+        <div class="kpi-card kpi-blue">
 
-                <div class="kpi-icon">
+            <div class="kpi-icon">
+                <i class="bi bi-lightning-charge-fill"></i>
+            </div>
 
-                    <i class="bi bi-lightning-charge-fill"></i>
+            <div class="kpi-content">
+
+                <span>Total Gangguan</span>
+
+                <h2 id="totalGangguan">0</h2>
+
+                <!-- Detail <5 dan >5 Menit -->
+                <div class="mt-2" style="font-size:14px; width:100%;">
+
+                    <div class="row text-center">
+
+                        <div class="col-6">
+                            <div class="text-success fw-semibold">
+                                🟢 &lt;5 Menit
+                            </div>
+                            <div class="fw-semibold" id="kurang5">0</div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="text-danger fw-semibold">
+                                🔴 &gt;5 Menit
+                            </div>
+                            <div class="fw-semibold" id="lebih5">0</div>
+                        </div>
+
+                    </div>
 
                 </div>
 
-                <div class="kpi-content">
-
-                    <span>Total Gangguan</span>
-
-                    <h2 id="totalGangguan">0</h2>
-
-                    <small>Jumlah gangguan tercatat</small>
-
-                </div>
+                <small>Jumlah gangguan tercatat</small>
 
             </div>
 
         </div>
+
+    </div>
+
+<!-- Sudah Tindak Lanjut -->
 
         <!-- Sudah Tindak Lanjut -->
         <div class="col">
@@ -568,6 +577,74 @@
             <hr>
 
             <canvas id="chartPenyebab"></canvas>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ======================================================
+                    PIE CHART ANALISIS
+======================================================= -->
+
+<div class="row g-4 mt-1">
+
+    <!-- Pie Indikator Rele -->
+    <div class="col-lg-4">
+
+        <div class="panel">
+
+            <div class="panel-title">
+                <i class="bi bi-shield-fill-check"></i>
+                <span>Distribusi Indikator Rele</span>
+            </div>
+
+            <hr>
+
+            <div class="chart-container">
+                <canvas id="chartIndikatorRele"></canvas>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Pie Jenis -->
+    <div class="col-lg-4">
+
+        <div class="panel">
+
+            <div class="panel-title">
+                <i class="bi bi-lightning-charge-fill"></i>
+                <span>Distribusi Jenis Gangguan</span>
+            </div>
+
+            <hr>
+
+            <div class="chart-container">
+                <canvas id="chartJenis"></canvas>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Pie Interval Jam -->
+    <div class="col-lg-4">
+
+        <div class="panel">
+
+            <div class="panel-title">
+                <i class="bi bi-clock-fill"></i>
+                <span>Distribusi Interval Jam</span>
+            </div>
+
+            <hr>
+
+            <div class="chart-container">
+                <canvas id="chartIntervalJam"></canvas>
+            </div>
 
         </div>
 

@@ -83,6 +83,9 @@ let tanggalAkhir = null;
 
 let chartBulanan = null;
 let chartPenyebab = null;
+let chartIndikatorRele;
+let chartJenis;
+let chartInterval;
 let chartUP3 = null;
 let chartPenyulang = null;
 let tabelGangguan = null;
@@ -107,34 +110,70 @@ const warnaPLN = {
 
 function updateDashboard(data){
 
-    // Ringkasan Dashboard
+    console.time("TOTAL");
+
+    console.time("KPI");
     tampilKPI(data);
+    console.timeEnd("KPI");
 
-    // Peta Gangguan
+    console.time("Marker");
     tampilMarker(data);
+    console.timeEnd("Marker");
 
-    // Visualisasi
+    console.time("Bulanan");
     tampilChartBulanan(data);
+    console.timeEnd("Bulanan");
+
+    console.time("Penyebab");
     tampilChartPenyebab(data);
+    console.timeEnd("Penyebab");
+
+    console.time("Indikator Rele");
+    tampilChartIndikatorRele(data);
+    console.timeEnd("Indikator Rele");
+
+    console.time("Jenis");
+    tampilChartJenis(data);
+    console.timeEnd("Jenis");
+
+    console.time("Interval");
+    tampilChartInterval(data);
+    console.timeEnd("Interval");
+
+    console.time("UP3");
     tampilChartUP3(data);
+    console.timeEnd("UP3");
+
+    console.time("Penyulang");
     tampilChartPenyulang(data);
+    console.timeEnd("Penyulang");
 
-    // Insight
+    console.time("Insight");
     tampilInsight(data);
+    console.timeEnd("Insight");
 
-    // Tabel
+    console.time("Tabel");
     tampilTabel(data);
+    console.timeEnd("Tabel");
+
+    console.timeEnd("TOTAL");
 }
 
 // ============================
 // Ambil Data JSON
 // ============================
 
-fetch("https://script.google.com/macros/s/AKfycbzE-ACX3ihGqOnsxR_nB_GOGgDtTWx886JfaXeCAd0o3BAtOhnkmCA16mFM8ei1G-Ry/exec")
+console.time("FETCH");
+
+fetch("https://script.google.com/macros/s/AKfycbyj-TctEFPmLOMUqC4jKEt986-Gu33NMIk6PBqsNRIe_wFt96IjX9VHlTAVDRPMkcOJoQ/exec")
     .then(res => res.json())
     .then(data => {
 
+        console.timeEnd("FETCH");
+
         semuaData = data;
+        console.log(Object.keys(data[0]));
+        console.log("Jumlah data:", data.length);
 
         isiFilter(data);
 
@@ -186,6 +225,7 @@ fetch("https://script.google.com/macros/s/AKfycbzE-ACX3ihGqOnsxR_nB_GOGgDtTWx886
     filterData();
 
 });
+
 // ============================
 // KPI
 // ============================
@@ -204,6 +244,21 @@ function tampilKPI(data){
 
     document.getElementById("sudahTL").textContent = sudah;
     document.getElementById("belumTL").textContent = belum;
+
+    // ============================
+    // Gangguan <5 dan >5 Menit
+    // ============================
+
+    const kurang5 = data.filter(
+        item => item["0:05:00"] === "<5"
+    ).length;
+
+    const lebih5 = data.filter(
+        item => item["0:05:00"] === ">5"
+    ).length;
+
+    document.getElementById("kurang5").textContent = kurang5;
+    document.getElementById("lebih5").textContent = lebih5;
 
     // ============================
     // Total ENS
@@ -227,9 +282,9 @@ function tampilKPI(data){
 
     const totalDetik = data.reduce((total, item) => {
 
-        if (!item.LamaPadam) return total;
+        if (!item.LamaPadam_Final) return total;
 
-        const waktu = item.LamaPadam.split(":");
+        const waktu = item.LamaPadam_Final.split(":");
 
         if (waktu.length !== 3) return total;
 
@@ -827,6 +882,354 @@ function tampilChartPenyebab(data){
         }
 
 // ============================
+// TOP INDIKATOR RELE
+// ============================
+
+function tampilChartIndikatorRele(data) {
+
+    const rekap = {};
+
+    data.forEach(item => {
+        const indikator = item["Indikator Rele"] || "Tidak Diketahui";
+        rekap[indikator] = (rekap[indikator] || 0) + 1;
+    });
+
+    const hasil = Object.entries(rekap)
+        .sort((a, b) => b[1] - a[1]);
+
+    const labels = hasil.map(item => item[0]);
+    const values = hasil.map(item => item[1]);
+
+    if (chartIndikatorRele) chartIndikatorRele.destroy();
+
+    chartIndikatorRele = new Chart(
+        document.getElementById("chartIndikatorRele"),
+        {
+            type: "doughnut",
+
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: [
+                        "#1565C0",
+                        "#42A5F5",
+                        "#26A69A",
+                        "#66BB6A",
+                        "#F9A825",
+                        "#FB8C00",
+                        "#EF5350",
+                        "#AB47BC",
+                        "#8D6E63",
+                        "#78909C"
+                    ],
+                    borderColor: "#FFFFFF",
+                    borderWidth: 2,
+                    hoverOffset: 12
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: "55%",
+
+                plugins: {
+
+                    legend: {
+                        position: "bottom",
+                        labels: {
+                            boxWidth: 15,
+                            boxHeight: 15,
+                            padding: 18,
+                            font: {
+                                size: 12,
+                                weight: "600"
+                            }
+                        }
+                    },
+
+                    datalabels: {
+                        color: "#f4faff",
+                        anchor: "center",
+                        align: "center",
+
+                        font: {
+                            size: 14,
+                            weight: "bold"
+                        },
+
+                        formatter: (value) => value >= 50 ? value : ""
+                    }
+
+                }
+            }
+        }
+    );
+
+}
+
+// ============================
+// DISTRIBUSI JENIS GANGGUAN
+// ============================
+
+function tampilChartJenis(data) {
+
+    const canvas = document.getElementById("chartJenis");
+
+    if (!canvas) return;
+
+    const hasil = {};
+
+    data.forEach(item => {
+
+        const jenis = item["Jenis"] || "Tidak Diketahui";
+
+        hasil[jenis] = (hasil[jenis] || 0) + 1;
+
+    });
+
+    const urut = Object.entries(hasil)
+        .sort((a, b) => b[1] - a[1]);
+
+    const labels = urut.map(item => item[0]);
+    const values = urut.map(item => item[1]);
+
+    if (chartJenis) {
+
+        chartJenis.data.labels = labels;
+        chartJenis.data.datasets[0].data = values;
+        chartJenis.update();
+
+        return;
+
+    }
+
+    chartJenis = new Chart(canvas, {
+
+        type: "doughnut",
+
+        data: {
+
+            labels: labels,
+
+            datasets: [{
+
+                data: values,
+
+                backgroundColor: [
+                    "#005BAC",
+                    "#1E88E5",
+                    "#26A69A",
+                    "#43A047",
+                    "#F9A825",
+                    "#FB8C00",
+                    "#E53935",
+                    "#8E24AA",
+                    "#6D4C41",
+                    "#546E7A"
+                ],
+
+                borderColor: "#FFFFFF",
+                borderWidth: 2,
+                hoverOffset: 8
+
+            }]
+
+        },
+
+        options: {
+
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "55%",
+
+            plugins: {
+
+                legend: {
+
+                    position: "bottom",
+
+                    labels: {
+
+                        boxWidth: 15,
+                        boxHeight: 15,
+                        padding: 15,
+
+                        font: {
+                            size: 12,
+                            weight: "bold"
+                        }
+
+                    }
+
+                },
+
+                tooltip: {
+
+                    callbacks: {
+
+                        label: function(context) {
+
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const persen = ((context.raw / total) * 100).toFixed(1);
+
+                            return `${context.label}: ${context.raw} (${persen}%)`;
+
+                        }
+
+                    }
+
+                },
+
+                datalabels: {
+
+                    color: "#FFFFFF",
+
+                    font: {
+                        size: 13,
+                        weight: "bold"
+                    },
+
+                    formatter: function(value, context) {
+
+                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                        const persen = (value / total) * 100;
+
+                        return persen >= 1 ? value : "";
+
+                    }
+
+                }
+
+            }
+
+        },
+
+        plugins: [ChartDataLabels]
+
+    });
+
+}
+
+// ============================
+// DISTRIBUSI INTERVAL JAM
+// ============================
+
+function tampilChartInterval(data) {
+    console.log(data[0]);
+    console.log(Object.keys(data[0]));
+    console.log(JSON.stringify(data[0], null, 2));
+
+    const canvas = document.getElementById("chartIntervalJam");
+
+    if (!canvas) return;
+
+    const hasil = {};
+
+    data.forEach(item => {
+
+        const interval = String(item["INTERVAL"] || "")
+            .trim();
+
+        const kategori =
+            interval === ""
+                ? "Tidak Diketahui"
+                : interval;
+
+        hasil[kategori] = (hasil[kategori] || 0) + 1;
+
+    });
+
+    const labels = Object.keys(hasil);
+    const values = Object.values(hasil);
+
+    if (chartInterval) {
+        chartInterval.destroy();
+    }
+
+    chartInterval = new Chart(canvas, {
+
+        type: "doughnut",
+
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: [
+                    "#005BAC",
+                    "#1E88E5",
+                    "#26A69A",
+                    "#43A047",
+                    "#F9A825",
+                    "#FB8C00",
+                    "#E53935",
+                    "#8E24AA"
+                ],
+                borderWidth: 2,
+                borderColor: "#fff"
+            }]
+        },
+
+        options: {
+
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "55%",
+
+            plugins: {
+
+                legend: {
+                    position: "bottom"
+                },
+
+                tooltip: {
+                    callbacks: {
+                        label(context) {
+
+                            const total = context.dataset.data.reduce((a,b)=>a+b,0);
+
+                            const persen =
+                                (context.raw / total * 100).toFixed(1);
+
+                            return `${context.label}: ${context.raw} (${persen}%)`;
+
+                        }
+                    }
+                },
+
+                datalabels: {
+
+                    color:"#fff",
+
+                    formatter(value,context){
+
+                        const total=context.dataset.data.reduce((a,b)=>a+b,0);
+
+                        const persen=value/total*100;
+
+                        return persen>=3 ? value : "";
+
+                    },
+
+                    font:{
+                        size:13,
+                        weight:"bold"
+                    }
+
+                }
+
+            }
+
+        },
+
+        plugins:[ChartDataLabels]
+
+    });
+
+}
+
+// ============================
 // TOP 10 UP3
 // ============================
 
@@ -1273,22 +1676,22 @@ function tampilInsight(data){
 // ============================
 function tampilTabel(data){
 
-    // Pertama kali buat DataTable
-    if(!tabelGangguan){
+    // Pertama kali membuat DataTable
+    if (!tabelGangguan){
 
         tabelGangguan = $("#tabelGangguan").DataTable({
 
-            pageLength:10,
+            pageLength: 10,
 
-            lengthMenu:[10,25,50,100],
+            lengthMenu: [10,25,50,100],
 
-            responsive:true,
+            responsive: true,
 
-            destroy:false,
+            destroy: false,
 
-            order:[],
+            order: [],
 
-            autoWidth:false,
+            autoWidth: false,
 
             language:{
 
@@ -1314,19 +1717,17 @@ function tampilTabel(data){
     // Kosongkan isi tabel
     tabelGangguan.clear();
 
-    // Tambahkan data baru
-    data.forEach((item,index)=>{
+    // Siapkan seluruh data sekaligus
+    const rows = data.map((item, index) => {
 
         const badge =
-            item["TINDAK LANJUT"]==="SUDAH TINDAK LANJUT"
-
+            item["TINDAK LANJUT"] === "SUDAH TINDAK LANJUT"
             ? `<span class="badge bg-success">Sudah</span>`
-
             : `<span class="badge bg-warning text-dark">Belum</span>`;
 
-        tabelGangguan.row.add([
+        return [
 
-            index+1,
+            index + 1,
 
             item["Tanggal Padam"] || "-",
 
@@ -1340,10 +1741,14 @@ function tampilTabel(data){
 
             badge
 
-        ]);
+        ];
 
     });
 
+    // Tambahkan seluruh data sekaligus
+    tabelGangguan.rows.add(rows);
+
+    // Render tabel sekali saja
     tabelGangguan.draw(false);
 
 }
@@ -1619,9 +2024,6 @@ function tampilMarker(data){
             icon: iconNormal
         });
 
-        console.log(Object.keys(item));
-        console.log("Penyulang:", item.Penyulang);
-
         marker.bindTooltip(
             `<b>${item.Penyulang}</b><br>${item.UP3} - ${item.ULP}`,
             {
@@ -1714,7 +2116,7 @@ function tampilMarker(data){
 
                     <div class="detail-item">
                         <div class="detail-label">⏱ Lama Padam</div>
-                        <div class="detail-value">${item.LamaPadam || "-"}</div>
+                        <div class="detail-value">${item.LamaPadam_Final || "-"}</div>
                     </div>
 
                     <div class="detail-item">
@@ -1738,7 +2140,7 @@ function tampilMarker(data){
                         </a>
                     </div>
                 </div>
-
+   
             `;
 
         });
