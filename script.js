@@ -1257,21 +1257,21 @@ function tampilChartUP3(data){
     }, {});
 
     const urut = Object.entries(hasil)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 10);
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);
 
     const labels = urut.map(item => item[0]);
     const values = urut.map(item => item[1]);
 
-   if(chartUP3){
+    if(chartUP3){
 
-    chartUP3.data.labels = labels;
-    chartUP3.data.datasets[0].data = values;
-    chartUP3.update();
+        chartUP3.data.labels = labels;
+        chartUP3.data.datasets[0].data = values;
+        chartUP3.update();
 
-    return;
+        return;
 
-}
+    }
 
     chartUP3 = new Chart(canvas,{
 
@@ -1321,6 +1321,26 @@ function tampilChartUP3(data){
 
                 tooltip:{
                     displayColors:false
+                },
+
+                // ===== LABEL ANGKA DI DALAM BAR =====
+                datalabels:{
+
+                    color:"#FFFFFF",
+
+                    anchor:"center",
+
+                    align:"center",
+
+                    clamp:true,
+
+                    formatter:(value)=>value,
+
+                    font:{
+                        size:14,
+                        weight:"bold"
+                    }
+
                 }
 
             },
@@ -1359,7 +1379,9 @@ function tampilChartUP3(data){
 
             }
 
-        }
+        },
+
+        plugins:[ChartDataLabels]
 
     });
 
@@ -1450,6 +1472,20 @@ function tampilChartPenyulang(data){
 
                 tooltip:{
                     displayColors:false
+                },
+
+                datalabels:{
+                    color:"#FFFFFF",
+                    anchor:"center",
+                    align:"center",
+                    clamp:true,
+
+                    formatter:(value)=>value,
+
+                    font:{
+                        size:14,
+                        weight:"bold"
+                    }
                 }
 
             },
@@ -1488,7 +1524,9 @@ function tampilChartPenyulang(data){
 
             }
 
-        }
+        },
+
+        plugins:[ChartDataLabels]
 
     });
 
