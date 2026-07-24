@@ -282,9 +282,9 @@ function tampilKPI(data){
 
     const totalDetik = data.reduce((total, item) => {
 
-        if (!item.LamaPadam_Final) return total;
+        if (!item["Lama Padam_Final"]) return total;
 
-        const waktu = item.LamaPadam_Final.split(":");
+        const waktu = item["Lama Padam_Final"].split(":");
 
         if (waktu.length !== 3) return total;
 
@@ -317,8 +317,14 @@ function tampilKPI(data){
         teksDurasi = `${detik} Detik`;
 
     }
+        const el = document.getElementById("rataPadam");
 
-    document.getElementById("rataPadam").textContent = teksDurasi;
+        console.log(el);
+        console.log(teksDurasi);
+
+        if (el) {
+            el.textContent = teksDurasi;
+        }
 
 }
 
@@ -2116,7 +2122,7 @@ function tampilMarker(data){
 
                     <div class="detail-item">
                         <div class="detail-label">⏱ Lama Padam</div>
-                        <div class="detail-value">${item.LamaPadam_Final || "-"}</div>
+                        <div class="detail-value">${item["Lama Padam_Final"] || "-"}</div>
                     </div>
 
                     <div class="detail-item">
