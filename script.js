@@ -165,7 +165,7 @@ function updateDashboard(data){
 
 console.time("FETCH");
 
-fetch("https://script.google.com/macros/s/AKfycbyj-TctEFPmLOMUqC4jKEt986-Gu33NMIk6PBqsNRIe_wFt96IjX9VHlTAVDRPMkcOJoQ/exec")
+fetch("https://script.google.com/macros/s/AKfycby9ZZy7cNQeWWhbquJbuPXT6cEYVO4-CgfShtNvrFR1j78iy7o7TjSV3-FQ3pMcqBXbhA/exec")
     .then(res => res.json())
     .then(data => {
 
@@ -1528,20 +1528,20 @@ function tampilInsight(data){
         .sort((a,b)=>b[1]-a[1])[0];
 
     // ==========================
-    // GI Terbanyak
+    // Penyulang Terbanyak
     // ==========================
 
-    const gi = {};
+    const penyulang = {};
 
     data.forEach(item => {
 
-        const nama = item["Gardu Induk"] || "-";
+        const nama = item["Penyulang"] || "-";
 
-        gi[nama] = (gi[nama] || 0) + 1;
+        penyulang[nama] = (penyulang[nama] || 0) + 1;
 
     });
 
-    const topGI = Object.entries(gi)
+    const topPenyulang = Object.entries(penyulang)
         .sort((a,b)=>b[1]-a[1])[0];
 
     // ==========================
@@ -1658,15 +1658,15 @@ function tampilInsight(data){
 
     }
 
-    // Jika tidak memilih GI
-    if(filterGI === ""){
+    // Jika tidak memilih Penyulang
+    if(filterPenyulang === ""){
 
-        isiInsight += ` Gardu Induk dengan jumlah gangguan tertinggi adalah <b>${topGI[0]}</b> sebanyak <b>${topGI[1]}</b> kejadian.`;
+        isiInsight += ` Penyulang dengan jumlah gangguan tertinggi adalah <b>${topPenyulang[0]}</b> sebanyak <b>${topPenyulang[1]}</b> kejadian.`;
 
     }
     else{
 
-        isiInsight += ` Analisis difokuskan pada <b>Gardu Induk ${filterGI}</b>.`;
+        isiInsight += ` Analisis difokuskan pada <b>Penyulang ${filterPenyulang}</b>.`;
 
     }
 
