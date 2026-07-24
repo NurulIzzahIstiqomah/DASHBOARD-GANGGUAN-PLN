@@ -176,7 +176,7 @@ fetch("https://script.google.com/macros/s/AKfycby9ZZy7cNQeWWhbquJbuPXT6cEYVO4-Cg
         console.log("Jumlah data:", data.length);
 
         isiFilter(data);
-
+        console.log(data.length);
         updateDashboard(data);
 
     })
@@ -231,6 +231,7 @@ fetch("https://script.google.com/macros/s/AKfycby9ZZy7cNQeWWhbquJbuPXT6cEYVO4-Cg
 // ============================
 
 function tampilKPI(data){
+     console.log("KPI data:", data.length);
 
     document.getElementById("totalGangguan").textContent = data.length;
 
